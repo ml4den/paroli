@@ -8,9 +8,9 @@
 		}
 	</script>
 	<meta charset="utf-8" />
-	<title>Correct Horse Battery Staple | Generate Secure Memorable Passwords</title>
-	<meta name="description" content="Correct Horse Battery Staple, Generate Secure Memorable Passwords. A secure password will help keep you safer online" />
-	<meta name="keywords" content="Correct Horse Battery Staple, Generate Secure Memorable Passwords, xkcd, secure password, memorable password, password generator" />
+	<title>Български генератор на пароли</title>
+	<meta name="description" content="Български генератор на пароли. Помага при създаването на запомнящи се пароли на български език." />
+	<meta name="keywords" content="генератор на пароли, пароли на български, xkcd, запомняща се парола, сигурна парола, password generator" />
 	<meta name="revisit-after" content="7 days" />
 	<meta name="robots" content="index,follow" />
 	<meta name="rating" content="General" />
@@ -33,18 +33,18 @@
 <body>
 
 	<div id="container">
-		<h1>Correct Horse Battery Staple</h1>
+		<h1>Български генератор на пароли</h1>
 		<div id="content">
-			<h2>Secure password generator to help keep you safer online</h2>
+			<h2>Генерирайте сигурни, запомнящи се пароли на български</h2>
 			<hr>
 			<div class="field input">
-				<input type="text" id="txt"/><strong>Length:</strong><em>0</em>
+				<input type="text" id="txt"/><strong>Дължина:</strong><em>0</em>
 			</div>
 
 			<div class="fieldset">
 				<legend>Options</legend>
 				<div class="field">
-					<label for="min-words">Min words</label>
+					<label for="min-words">Думи</label>
 					<select id="min-words" data-option="minWords">
 						<option value="2">2</option>
 						<option value="3">3</option>
@@ -60,7 +60,7 @@
 
 				</div>
 				<div class="field">
-					<label for="min-length">Min Length</label>
+					<label for="min-length">Дължина</label>
 					<select id="min-length" data-option="minLength">
 						<option value="10">10</option>
 						<option value="15">15</option>
@@ -70,27 +70,27 @@
 						<option value="35">35</option>
 						<option value="40">40</option>
 					</select>
-					<small>(including the separator)</small>
+					<small>(Минимална, вкл. разделителите)</small>
 				</div>
 
 				<div class="field">
-					<label for="separator">Separator</label>
-					<input type="text" id="separator" data-option="separator" value="-" /> <small>(Multiple values will be used randomly, try <strong>*&amp;^%$#!</strong> )</small>
+					<label for="separator">Разделители</label>
+					<input type="text" id="separator" data-option="separator" value="-_" /> <small>(Ако въведете няколко, ще се избират случайно. Пробвайте <strong>*&amp;^%$#!</strong> )</small>
 				</div>
 
 				<div class="field cbx">
 					<input type="checkbox" checked="checked" data-option="firstUpper" id="first-upper" />
-					<label for="first-upper">Make First Letter Uppercase</label>
+					<label for="first-upper">Прави първата буква главна</label>
 				</div>
 
 				<div class="field cbx">
 					<input type="checkbox" checked="checked" data-option="appendNumbers" id="append-numbers" />
-					<label for="append-numbers">Append random number to the end (0 - 9)</label>
+					<label for="append-numbers">Добавяй случайна цифра в края (0 - 9)</label>
 				</div>
 
 				<div class="field cbx">
 					<input type="checkbox" data-option="saveOptions" id="save-options" />
-					<label for="save-options"><strong>Save these options.*</strong></label>
+					<label for="save-options"><strong>Запази настройките (локално)</strong></label>
 				</div>
 
 				<!--<div class="field cbx">-->
@@ -99,14 +99,14 @@
 				<!--</div>-->
 			</div>
 
-			<div class="field"><input type="button" id="btn-generate" class="button" value="Generate password"/></div>
+			<div class="field"><input type="button" id="btn-generate" class="button" value="Генерирай парола"/></div>
 		</div>
 	</div>
 
 	<div class="footnote">
-		<p>This is an <a href="http://xkcd.com/936/">XKCD inspired</a> password generator.</p>
-		<p>*Saving options will utilise LocalStorage. De-selecting will remove the options from LocalStorage. </p>
-		<p>Built and maintained by <a href="http://twitter.com/geekyjohn">JVDL</a> (on <a href="https://bitbucket.org/jvdl/correcthorsebatterystaple">Bitbucket</a>)</p>
+		<p>Паролите ви се генерират локално в браузъра и не се изпращат или получават от други точки в готов вид. Можете да видите сорса на тази страница в <a href="https://github.com/ml4den/paroli">GitHub</a>.</p>
+		<p>Този вдъхновен от <a href="http://xkcd.com/936/">XKCD</a> генератор е базиран на код от <a href="http://twitter.com/geekyjohn">JVDL</a> в <a href="https://bitbucket.org/jvdl/correcthorsebatterystaple">Bitbucket</a> и е представен от <a href="https://kirilov.ml">kirilov.ml</a>.</p>
+
 	</div>
 
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
@@ -115,7 +115,7 @@
 	<script type="text/javascript">
 
 		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-30464405-1']);
+		_gaq.push(['_setAccount', 'UA-99090379-1']);
 		_gaq.push(['_trackPageview']);
 
 		(function() {
