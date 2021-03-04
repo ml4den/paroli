@@ -1,7 +1,7 @@
 *{box-sizing:border-box}
 body{background:#222;color:#111;padding:20px;font-family:"Palatino Linotype",Palatino,Palladio,"URW Palladio L","Book Antiqua",Baskerville,"Bookman Old Style","Bitstream Charter","Nimbus Roman No9 L",Garamond,"Apple Garamond","ITC Garamond Narrow","New Century Schoolbook","Century Schoolbook","Century Schoolbook L",Georgia,serif;font-size:16px}
 input[type=text]{width:60px}
-label{width:100px;display:block;float:left}
+label{width:120px;display:block;float:left}
 hr{margin:20px 0}
 h1{font-size:38px;margin:0 auto;width:900px;position:relative;padding:5px 50px 10px;background:#eeeeee;background:linear-gradient(to bottom, #eee 0, #ccc 100%);border-radius:10px 10px 0 0;box-shadow:0 3px 5px rgba(0,0,0,0.3)}
 #content{margin:0 auto;width:900px;padding:10px 50px 40px;background:#ccc;border-radius:0 0 10px 10px;box-shadow:0 0 20px 3px rgba(0,0,0,0.6)}

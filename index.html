@@ -41,14 +41,19 @@
 				<input type="text" id="txt"/><strong></strong><em>0</em>
 			</div>
 
+			<div class="field">
+				<label for="separator">Разделители</label>
+				<input type="text" id="separator" data-option="separator" value="-_" /> <small>(Избират се случайно. Пробвайте <strong>*&amp;^%$#!</strong> )</small>
+			</div>
+
 			<div class="fieldset">
 				<legend>Options</legend>
 				<div class="field">
-					<label for="min-words">Думи</label>
+					<label for="min-words">Мин. думи</label>
 					<select id="min-words" data-option="minWords">
-						<option value="2">2</option>
+						<option value="2" selected="selected">2</option>
 						<option value="3">3</option>
-						<option value="4" selected="selected">4</option>
+						<option value="4">4</option>
 						<option value="5">5</option>
 						<option value="6">6</option>
 						<option value="7">7</option>
@@ -57,35 +62,30 @@
 						<option value="10">10</option>
 					</select>
 
-
 				</div>
 				<div class="field">
-					<label for="min-length">Дължина</label>
+					<label for="min-length">Мин. дължина</label>
 					<select id="min-length" data-option="minLength">
 						<option value="10">10</option>
-						<option value="15">15</option>
-						<option value="20" selected="selected">20</option>
+						<option value="15" selected="selected">15</option>
+						<option value="20">20</option>
 						<option value="25">25</option>
 						<option value="30">30</option>
 						<option value="35">35</option>
 						<option value="40">40</option>
 					</select>
-					<small>(Минимална, вкл. разделителите)</small>
+					<small>(вкл. разделителите)</small>
 				</div>
 
-				<div class="field">
-					<label for="separator">Разделители</label>
-					<input type="text" id="separator" data-option="separator" value="-_" /> <small>(Ако въведете няколко, ще се избират случайно. Пробвайте <strong>*&amp;^%$#!</strong> )</small>
-				</div>
 
 				<div class="field cbx">
 					<input type="checkbox" checked="checked" data-option="firstUpper" id="first-upper" />
-					<label for="first-upper">Прави първата буква главна</label>
+					<label for="first-upper">Главна първа буква</label>
 				</div>
 
 				<div class="field cbx">
 					<input type="checkbox" checked="checked" data-option="appendNumbers" id="append-numbers" />
-					<label for="append-numbers">Добавяй случайна цифра в края (0 - 9)</label>
+					<label for="append-numbers">Случайна цифра в края (0 - 9)</label>
 				</div>
 
 				<div class="field cbx">
