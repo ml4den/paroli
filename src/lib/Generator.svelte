@@ -3,7 +3,7 @@
   let wordlist = [];
 
   onMount(async () => {
-    const response = await fetch("./src/assets/wordlist.txt");
+    const response = await fetch("wordlist.txt");
     const text = await response.text();
     wordlist = text.split(",");
     buildPassword();
