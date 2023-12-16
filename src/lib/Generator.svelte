@@ -136,7 +136,6 @@
             </svg>
           </button>
         </div>
-        <span class="character-counter">{randomNum.length} characters</span>
       </label>
 
       <label for="dividersInput" class="number-generator-label">
