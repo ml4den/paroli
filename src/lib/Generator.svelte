@@ -222,6 +222,8 @@
     border-radius: 0.5rem;
     display: inline-block;
     margin-bottom: 1rem;
+    word-wrap: break-word; /* Change made here */
+    max-width: 90%; /* Change made here */
   }
 
   .copy-icon-button {
