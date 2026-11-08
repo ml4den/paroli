@@ -4,8 +4,8 @@ A dependency-free, single-page passphrase generator using the existing Bulgarian
 dictionary in `public/wordlist.txt`. Passphrases are generated in the browser
 with `crypto.getRandomValues`; no generated text is sent to a server.
 
-The Romanized view uses the BGN/PCGN letter mappings, including `ъ → a`,
-`ь → y`, and `щ → sht`.
+The Romanized view uses the BGN/PCGN letter mappings, including `х → h`,
+`ъ → a`, `ь → y`, and `щ → sht`.
 
 ## Run locally
 
