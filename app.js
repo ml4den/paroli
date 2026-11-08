@@ -12,6 +12,7 @@
   const wordCountValue = document.querySelector("#word-count-value");
   const wordCountChip = document.querySelector("#word-count-chip");
   const separatorInput = document.querySelector("#separator");
+  const includeNumberInput = document.querySelector("#include-number");
   const passphrase = document.querySelector("#passphrase");
   const generateButton = document.querySelector("#generate-button");
   const copyButton = document.querySelector("#copy-button");
@@ -24,6 +25,7 @@
 
   let words = [];
   let chosenWords = [];
+  let generatedNumber = "";
   let activeView = "cyrillic";
   const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
   const themeModes = ["system", "light", "dark"];
@@ -107,7 +109,10 @@
       ? cyrillicWords.map(transliterate)
       : cyrillicWords;
 
-    passphrase.textContent = renderedWords.join(separator);
+    const passphraseParts = generatedNumber
+      ? [...renderedWords, generatedNumber]
+      : renderedWords;
+    passphrase.textContent = passphraseParts.join(separator);
     passphrase.lang = activeView === "romanized" ? "en-Latn" : "bg";
     copyButton.disabled = chosenWords.length === 0;
     copyButton.querySelector("span").textContent = "Copy";
@@ -118,6 +123,9 @@
     try {
       const count = Number(wordCountInput.value);
       chosenWords = Array.from({ length: count }, () => words[secureIndex(words.length)]);
+      generatedNumber = includeNumberInput.checked
+        ? String(10 + secureIndex(90))
+        : "";
       wordCountValue.value = String(count);
       wordCountChip.textContent = `${count} ${count === 1 ? "word" : "words"}`;
       renderPassphrase();
@@ -125,8 +133,26 @@
       statusMessage.classList.remove("is-error");
     } catch (error) {
       chosenWords = [];
+      generatedNumber = "";
       passphrase.textContent = "Unable to generate";
       copyButton.disabled = true;
+      statusMessage.textContent = error.message;
+      statusMessage.classList.add("is-error");
+    }
+  }
+
+  function updateRandomNumber() {
+    if (chosenWords.length === 0) return;
+    try {
+      generatedNumber = includeNumberInput.checked
+        ? String(10 + secureIndex(90))
+        : "";
+      renderPassphrase();
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("is-error");
+    } catch (error) {
+      generatedNumber = "";
+      passphrase.textContent = "Unable to generate";
       statusMessage.textContent = error.message;
       statusMessage.classList.add("is-error");
     }
@@ -197,6 +223,7 @@
 
   wordCountInput.addEventListener("input", generate);
   separatorInput.addEventListener("change", renderPassphrase);
+  includeNumberInput.addEventListener("change", updateRandomNumber);
   generateButton.addEventListener("click", generate);
   copyButton.addEventListener("click", copyCurrentPhrase);
 

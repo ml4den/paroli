@@ -404,6 +404,40 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
 }
 
+.number-option {
+  display: flex;
+  min-height: 39px;
+  align-items: center;
+  align-self: start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.number-option input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.number-option-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.number-option-copy strong {
+  color: #48584e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.number-option-copy span {
+  color: #939d95;
+  font-size: 11px;
+}
+
 .generate-button {
   display: flex;
   width: 100%;
@@ -691,6 +725,14 @@ input[type="range"]::-moz-range-thumb {
     outline-color: #79bb8c;
     background: #1c2820;
     color: #dbe6dc;
+  }
+
+  .number-option-copy strong {
+    color: #c2cec4;
+  }
+
+  .number-option-copy span {
+    color: #9aa89e;
   }
 
   .generate-button {
