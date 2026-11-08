@@ -274,6 +274,10 @@ h1 span {
   text-decoration: none;
 }
 
+.rules-link[hidden] {
+  display: none;
+}
+
 .rules-link:hover {
   color: var(--green);
   text-decoration: underline;
@@ -419,12 +423,6 @@ input[type="range"]::-moz-range-thumb {
 
 .page-footer p {
   margin: 5px 0;
-}
-
-.transliteration-note span {
-  color: #667a6b;
-  font-family: "Manrope", sans-serif;
-  font-weight: 700;
 }
 
 :focus-visible {

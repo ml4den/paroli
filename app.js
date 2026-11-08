@@ -16,6 +16,7 @@
   const generateButton = document.querySelector("#generate-button");
   const copyButton = document.querySelector("#copy-button");
   const statusMessage = document.querySelector("#status-message");
+  const rulesLink = document.querySelector("#rules-link");
   const tabs = [...document.querySelectorAll(".view-tab")];
 
   let words = [];
@@ -121,6 +122,7 @@
 
   function selectView(tab, focus = false) {
     activeView = tab.dataset.view;
+    rulesLink.hidden = activeView !== "romanized";
     tabs.forEach((item) => {
       const selected = item === tab;
       item.classList.toggle("is-active", selected);
