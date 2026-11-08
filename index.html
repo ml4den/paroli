@@ -1,13 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Български генератор на пароли</title>
+    <meta
+      name="description"
+      content="Generate memorable Bulgarian passphrases locally, with an optional BGN/PCGN romanized view."
+    />
+    <meta name="theme-color" content="#f5f3ed" />
+    <link rel="icon" href="./public/favicon.png" />
+    <title>Bulgarian Passphrase Generator</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Word by word home">
+          <span class="brand-mark" aria-hidden="true">Б</span>
+          <span>WORD BY WORD</span>
+        </a>
+        <span class="privacy-badge">
+          <span class="privacy-dot" aria-hidden="true"></span>
+          Runs entirely in your browser
+        </span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">A little Bulgarian, a lot more memorable</p>
+        <h1 id="page-title">A passphrase<br /><span>worth remembering.</span></h1>
+        <p class="intro">
+          Build a phrase from Bulgarian dictionary words. Switch between the
+          original Cyrillic and a BGN/PCGN romanized view.
+        </p>
+      </section>
+
+      <section class="generator-card" aria-label="Passphrase generator">
+        <div class="result-heading">
+          <div>
+            <p class="section-label">YOUR PASSPHRASE</p>
+            <p class="result-hint">Made locally. Nothing is sent anywhere.</p>
+          </div>
+          <span class="word-count-chip" id="word-count-chip">4 words</span>
+        </div>
+
+        <div class="result-box" aria-live="polite" aria-atomic="true">
+          <p class="passphrase" id="passphrase" lang="bg">Loading dictionary…</p>
+          <button class="copy-button" id="copy-button" type="button" aria-label="Copy passphrase">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+              <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+
+        <div class="view-switch" role="tablist" aria-label="Passphrase writing system">
+          <button class="view-tab is-active" id="cyrillic-tab" type="button" role="tab" aria-selected="true" aria-controls="passphrase" data-view="cyrillic">
+            <span aria-hidden="true">БГ</span> Cyrillic
+          </button>
+          <button class="view-tab" id="romanized-tab" type="button" role="tab" aria-selected="false" aria-controls="passphrase" data-view="romanized">
+            <span aria-hidden="true">Aa</span> Romanized
+          </button>
+          <a class="rules-link" href="https://en.wikipedia.org/wiki/Romanization_of_Bulgarian#BGN/PCGN" target="_blank" rel="noreferrer">
+            BGN/PCGN rules <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="controls">
+          <label class="range-control" for="word-count">
+            <span class="control-label">Number of words</span>
+            <span class="range-line">
+              <input id="word-count" type="range" min="3" max="8" value="4" />
+              <output id="word-count-value" for="word-count">4</output>
+            </span>
+            <span class="control-note">More words make a longer, stronger phrase.</span>
+          </label>
+
+          <label class="select-control" for="separator">
+            <span class="control-label">Word separator</span>
+            <select id="separator">
+              <option value="-">Hyphen —</option>
+              <option value=" ">Space</option>
+              <option value=".">Period .</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="generate-button" id="generate-button" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="M20 7v5h-5M4 17v-5h5"></path>
+            <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path>
+          </svg>
+          Generate another
+        </button>
+        <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <footer class="page-footer">
+        <p>
+          The dictionary is loaded as a static file. Random words come from
+          your browser’s cryptographic random generator.
+        </p>
+        <p class="transliteration-note">
+          Romanization is letter-by-letter: <span>ъ → a</span>,
+          <span>ь → y</span>, <span>щ → sht</span>.
+        </p>
+      </footer>
+    </main>
+    <script src="./app.js" defer></script>
   </body>
 </html>
