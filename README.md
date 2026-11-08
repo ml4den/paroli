@@ -3,7 +3,9 @@
 A dependency-free, single-page passphrase generator using the existing Bulgarian
 dictionary in `public/wordlist.txt`. Passphrases are generated in the browser
 with `crypto.getRandomValues`; no generated text is sent to a server.
-Choose from several word separators and optionally append a random two-digit number.
+Choose a fixed separator or open Advanced options to pick randomly from an
+editable character list. Advanced options also provide capitalization styles and
+a configurable 1–12 digit random number.
 
 The Romanized view uses the BGN/PCGN letter mappings, including `х → h`,
 `ъ → a`, `ь → y`, and `щ → sht`.

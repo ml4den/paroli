@@ -124,9 +124,46 @@
             <input id="include-number" type="checkbox" />
             <span class="number-option-copy">
               <strong>Append a random number</strong>
-              <span>Two digits, from 10 to 99</span>
+              <span id="number-option-note">Two digits, from 10 to 99</span>
             </span>
           </label>
+
+          <details class="advanced-options">
+            <summary>Advanced options</summary>
+            <div class="advanced-grid">
+              <label class="advanced-control" for="separator-characters">
+                <span class="control-label">Random separator characters</span>
+                <input
+                  id="separator-characters"
+                  type="text"
+                  value="~!@#$%^&amp;*()_-+={}[]|:;&quot;'&lt;,&gt;.?/"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                />
+                <span class="control-note">One character is chosen randomly between each word.</span>
+              </label>
+
+              <label class="advanced-control" for="number-length">
+                <span class="control-label">Random number length</span>
+                <span class="number-length-line">
+                  <input id="number-length" type="number" min="1" max="12" value="2" inputmode="numeric" />
+                  <span>digits</span>
+                </span>
+                <span class="control-note">The number is added after the final word.</span>
+              </label>
+
+              <label class="advanced-control" for="capitalization">
+                <span class="control-label">Capitalization</span>
+                <select id="capitalization">
+                  <option value="title">Capitalize each word</option>
+                  <option value="lower">all lowercase</option>
+                  <option value="first">First letter of phrase</option>
+                  <option value="upper">ALL CAPS</option>
+                </select>
+              </label>
+            </div>
+          </details>
         </div>
 
         <button class="generate-button" id="generate-button" type="button" disabled>

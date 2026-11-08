@@ -13,6 +13,11 @@
   const wordCountChip = document.querySelector("#word-count-chip");
   const separatorInput = document.querySelector("#separator");
   const includeNumberInput = document.querySelector("#include-number");
+  const numberLengthInput = document.querySelector("#number-length");
+  const numberOptionNote = document.querySelector("#number-option-note");
+  const separatorCharactersInput = document.querySelector("#separator-characters");
+  const capitalizationInput = document.querySelector("#capitalization");
+  const advancedOptions = document.querySelector(".advanced-options");
   const passphrase = document.querySelector("#passphrase");
   const generateButton = document.querySelector("#generate-button");
   const copyButton = document.querySelector("#copy-button");
@@ -26,6 +31,7 @@
   let words = [];
   let chosenWords = [];
   let generatedNumber = "";
+  let generatedSeparators = [];
   let activeView = "cyrillic";
   const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
   const themeModes = ["system", "light", "dark"];
@@ -91,6 +97,13 @@
     return word.charAt(0).toLocaleUpperCase("bg-BG") + word.slice(1);
   }
 
+  function capitalize(word, mode) {
+    if (mode === "upper") return word.toLocaleUpperCase("bg-BG");
+    if (mode === "lower") return word.toLocaleLowerCase("bg-BG");
+    if (mode === "first") return word.toLocaleLowerCase("bg-BG");
+    return titleCase(word.toLocaleLowerCase("bg-BG"));
+  }
+
   function transliterate(text) {
     return Array.from(text, (character) => {
       const lower = character.toLocaleLowerCase("bg-BG");
@@ -103,19 +116,64 @@
   }
 
   function renderPassphrase() {
-    const separator = separatorInput.value;
-    const cyrillicWords = chosenWords.map(titleCase);
-    const renderedWords = activeView === "romanized"
-      ? cyrillicWords.map(transliterate)
-      : cyrillicWords;
-
-    const passphraseParts = generatedNumber
-      ? [...renderedWords, generatedNumber]
-      : renderedWords;
-    passphrase.textContent = passphraseParts.join(separator);
+    const mode = capitalizationInput.value;
+    const lowerWords = chosenWords.map((word) => word.toLocaleLowerCase("bg-BG"));
+    const uncapitalizedWords = activeView === "romanized"
+      ? lowerWords.map(transliterate)
+      : lowerWords;
+    const renderedWords = uncapitalizedWords.map((word, index) => {
+      if (mode === "first") return index === 0 ? titleCase(word) : word;
+      return capitalize(word, mode);
+    });
+    const parts = generatedNumber ? [...renderedWords, generatedNumber] : renderedWords;
+    passphrase.textContent = parts.reduce((phrase, part, index) => {
+      if (index === 0) return part;
+      return `${phrase}${generatedSeparators[index - 1] ?? separatorInput.value}${part}`;
+    }, "");
     passphrase.lang = activeView === "romanized" ? "en-Latn" : "bg";
     copyButton.disabled = chosenWords.length === 0;
     copyButton.querySelector("span").textContent = "Copy";
+  }
+
+  function randomNumber() {
+    const requestedLength = advancedOptions.open ? Number(numberLengthInput.value) : 2;
+    if (!Number.isInteger(requestedLength) || requestedLength < 1 || requestedLength > 12) {
+      throw new Error("Choose a random number length from 1 to 12 digits.");
+    }
+    const firstDigit = String(1 + secureIndex(9));
+    const remainingDigits = Array.from(
+      { length: requestedLength - 1 },
+      () => String(secureIndex(10))
+    );
+    return firstDigit + remainingDigits.join("");
+  }
+
+  function refreshGeneratedSeparators() {
+    const partCount = chosenWords.length + (generatedNumber ? 1 : 0);
+    const separatorCount = Math.max(0, partCount - 1);
+    if (advancedOptions.open) {
+      const characters = Array.from(separatorCharactersInput.value);
+      if (characters.length === 0 && separatorCount > 0) {
+        throw new Error("Add at least one character to the random separator list.");
+      }
+      generatedSeparators = Array.from(
+        { length: separatorCount },
+        () => characters[secureIndex(characters.length)]
+      );
+      return;
+    }
+    generatedSeparators = Array(separatorCount).fill(separatorInput.value);
+  }
+
+  function updateNumberNote() {
+    if (!advancedOptions.open) {
+      numberOptionNote.textContent = "Two digits, from 10 to 99";
+      return;
+    }
+    const digits = Number(numberLengthInput.value);
+    numberOptionNote.textContent = Number.isInteger(digits) && digits >= 1 && digits <= 12
+      ? `${digits} ${digits === 1 ? "digit" : "digits"}`
+      : "Choose 1–12 digits";
   }
 
   function generate() {
@@ -124,8 +182,9 @@
       const count = Number(wordCountInput.value);
       chosenWords = Array.from({ length: count }, () => words[secureIndex(words.length)]);
       generatedNumber = includeNumberInput.checked
-        ? String(10 + secureIndex(90))
+        ? randomNumber()
         : "";
+      refreshGeneratedSeparators();
       wordCountValue.value = String(count);
       wordCountChip.textContent = `${count} ${count === 1 ? "word" : "words"}`;
       renderPassphrase();
@@ -134,6 +193,7 @@
     } catch (error) {
       chosenWords = [];
       generatedNumber = "";
+      generatedSeparators = [];
       passphrase.textContent = "Unable to generate";
       copyButton.disabled = true;
       statusMessage.textContent = error.message;
@@ -145,13 +205,15 @@
     if (chosenWords.length === 0) return;
     try {
       generatedNumber = includeNumberInput.checked
-        ? String(10 + secureIndex(90))
+        ? randomNumber()
         : "";
+      refreshGeneratedSeparators();
       renderPassphrase();
       statusMessage.textContent = "";
       statusMessage.classList.remove("is-error");
     } catch (error) {
       generatedNumber = "";
+      generatedSeparators = [];
       passphrase.textContent = "Unable to generate";
       statusMessage.textContent = error.message;
       statusMessage.classList.add("is-error");
@@ -222,8 +284,48 @@
   tabs.forEach((tab, index) => { tab.tabIndex = index === 0 ? 0 : -1; });
 
   wordCountInput.addEventListener("input", generate);
-  separatorInput.addEventListener("change", renderPassphrase);
+  separatorInput.addEventListener("change", () => {
+    try {
+      refreshGeneratedSeparators();
+      renderPassphrase();
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("is-error");
+    } catch (error) {
+      statusMessage.textContent = error.message;
+      statusMessage.classList.add("is-error");
+    }
+  });
   includeNumberInput.addEventListener("change", updateRandomNumber);
+  numberLengthInput.addEventListener("input", () => {
+    updateNumberNote();
+    if (includeNumberInput.checked && advancedOptions.open) updateRandomNumber();
+  });
+  separatorCharactersInput.addEventListener("input", () => {
+    if (!advancedOptions.open) return;
+    try {
+      refreshGeneratedSeparators();
+      renderPassphrase();
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("is-error");
+    } catch (error) {
+      statusMessage.textContent = error.message;
+      statusMessage.classList.add("is-error");
+    }
+  });
+  capitalizationInput.addEventListener("change", renderPassphrase);
+  advancedOptions.addEventListener("toggle", () => {
+    updateNumberNote();
+    if (includeNumberInput.checked) updateRandomNumber();
+    else {
+      try {
+        refreshGeneratedSeparators();
+        renderPassphrase();
+      } catch (error) {
+        statusMessage.textContent = error.message;
+        statusMessage.classList.add("is-error");
+      }
+    }
+  });
   generateButton.addEventListener("click", generate);
   copyButton.addEventListener("click", copyCurrentPhrase);
 

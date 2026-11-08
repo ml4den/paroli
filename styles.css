@@ -404,6 +404,72 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
 }
 
+.advanced-options {
+  grid-column: 1 / -1;
+  border: 1px solid #e8ece6;
+  border-radius: 10px;
+  background: #fcfdfb;
+}
+
+.advanced-options summary {
+  padding: 12px 14px;
+  color: #48584e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  list-style-position: inside;
+}
+
+.advanced-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(130px, 0.7fr);
+  gap: 18px;
+  padding: 2px 14px 16px;
+}
+
+.advanced-control {
+  display: block;
+  min-width: 0;
+}
+
+.advanced-control:first-child {
+  grid-column: 1 / -1;
+}
+
+.advanced-control .control-label {
+  margin-bottom: 8px;
+}
+
+.advanced-control input[type="text"],
+.advanced-control input[type="number"],
+.advanced-control select {
+  width: 100%;
+  min-height: 39px;
+  padding: 0 10px;
+  border: 1px solid #e2e7e0;
+  border-radius: 8px;
+  outline-color: #82a08b;
+  background: #fff;
+  color: #45574b;
+  font-size: 12px;
+}
+
+.advanced-control input[type="text"] {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+.number-length-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #748078;
+  font-size: 12px;
+}
+
+.number-length-line input {
+  max-width: 90px;
+}
+
 .number-option {
   display: flex;
   min-height: 39px;
@@ -570,6 +636,15 @@ input[type="range"]::-moz-range-thumb {
     gap: 19px;
   }
 
+  .advanced-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .advanced-control:first-child {
+    grid-column: auto;
+  }
+
   .rules-link {
     font-size: 10px;
   }
@@ -725,6 +800,28 @@ input[type="range"]::-moz-range-thumb {
     outline-color: #79bb8c;
     background: #1c2820;
     color: #dbe6dc;
+  }
+
+  .advanced-options {
+    border-color: #3c4d41;
+    background: #202b24;
+  }
+
+  .advanced-options summary {
+    color: #c2cec4;
+  }
+
+  .advanced-control input[type="text"],
+  .advanced-control input[type="number"],
+  .advanced-control select {
+    border-color: #415347;
+    outline-color: #79bb8c;
+    background: #1c2820;
+    color: #dbe6dc;
+  }
+
+  .number-length-line {
+    color: #9aa89e;
   }
 
   .number-option-copy strong {
