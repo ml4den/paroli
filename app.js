@@ -17,11 +17,56 @@
   const copyButton = document.querySelector("#copy-button");
   const statusMessage = document.querySelector("#status-message");
   const rulesLink = document.querySelector("#rules-link");
+  const themeToggle = document.querySelector("#theme-toggle");
+  const themeModeLabel = document.querySelector("#theme-mode-label");
+  const themeColor = document.querySelector("#theme-color");
   const tabs = [...document.querySelectorAll(".view-tab")];
 
   let words = [];
   let chosenWords = [];
   let activeView = "cyrillic";
+  const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+  const themeModes = ["system", "light", "dark"];
+  let themeMode = themeModes.includes(document.documentElement.dataset.themeMode)
+    ? document.documentElement.dataset.themeMode
+    : "system";
+
+  function applyThemeMode() {
+    const theme = themeMode === "system"
+      ? (themeMedia.matches ? "dark" : "light")
+      : themeMode;
+    document.documentElement.dataset.themeMode = themeMode;
+    document.documentElement.dataset.theme = theme;
+    themeModeLabel.textContent = themeMode.charAt(0).toUpperCase() + themeMode.slice(1);
+    themeToggle.setAttribute(
+      "aria-label",
+      `Appearance setting: ${themeMode}. Activate to switch to another mode.`
+    );
+    themeColor.content = theme === "dark" ? "#111813" : "#f5f3ed";
+  }
+
+  themeToggle.addEventListener("click", () => {
+    if (themeMode === "system") {
+      themeMode = themeMedia.matches ? "light" : "dark";
+    } else {
+      themeMode = themeMode === "light" ? "dark" : "system";
+    }
+    try {
+      localStorage.setItem("bulgarian-passphrase-theme", themeMode);
+    } catch {}
+    applyThemeMode();
+  });
+
+  if (typeof themeMedia.addEventListener === "function") {
+    themeMedia.addEventListener("change", () => {
+      if (themeMode === "system") applyThemeMode();
+    });
+  } else if (typeof themeMedia.addListener === "function") {
+    themeMedia.addListener(() => {
+      if (themeMode === "system") applyThemeMode();
+    });
+  }
+  applyThemeMode();
 
   function secureIndex(max) {
     if (!Number.isSafeInteger(max) || max < 1) {

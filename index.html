@@ -7,8 +7,24 @@
       name="description"
       content="Generate memorable Bulgarian passphrases locally, with an optional BGN/PCGN romanized view."
     />
-    <meta name="theme-color" content="#f5f3ed" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#111813" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" id="theme-color" content="#f5f3ed" />
+    <script>
+      (() => {
+        const themeKey = "bulgarian-passphrase-theme";
+        const validModes = ["system", "light", "dark"];
+        let mode = "system";
+        try {
+          const savedMode = localStorage.getItem(themeKey);
+          if (validModes.includes(savedMode)) mode = savedMode;
+        } catch {}
+
+        const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+        const theme = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+        document.documentElement.dataset.themeMode = mode;
+        document.documentElement.dataset.theme = theme;
+        document.getElementById("theme-color").content = theme === "dark" ? "#111813" : "#f5f3ed";
+      })();
+    </script>
     <link rel="icon" href="./public/favicon.png" />
     <title>Bulgarian Passphrase Generator</title>
     <link rel="stylesheet" href="./styles.css" />
@@ -20,10 +36,26 @@
           <span class="brand-mark" aria-hidden="true">Б</span>
           <span>WORD BY WORD</span>
         </a>
-        <span class="privacy-badge">
-          <span class="privacy-dot" aria-hidden="true"></span>
-          Runs entirely in your browser
-        </span>
+        <div class="topbar-actions">
+          <span class="privacy-badge">
+            <span class="privacy-dot" aria-hidden="true"></span>
+            Runs entirely in your browser
+          </span>
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            type="button"
+            aria-label="Appearance setting: system"
+            title="Cycle appearance between System, Light, and Dark"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 3a9 9 0 0 0 0 18z"></path>
+            </svg>
+            <span>Theme</span>
+            <strong id="theme-mode-label">System</strong>
+          </button>
+        </div>
       </header>
 
       <section class="hero" aria-labelledby="page-title">
