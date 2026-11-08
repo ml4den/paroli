@@ -492,3 +492,159 @@ input[type="range"]::-moz-range-thumb {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    color: #e2ebe4;
+    background: #111813;
+    --green: #39734d;
+    --green-dark: #d7e8da;
+    --muted: #adbbb0;
+    --line: #35453a;
+    --paper: #1c2820;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at 76% 9%, rgba(76, 112, 82, 0.2), transparent 28rem),
+      #111813;
+  }
+
+  .privacy-badge,
+  .intro {
+    color: #b4c1b7;
+  }
+
+  .privacy-dot {
+    background: #70bd88;
+    box-shadow: 0 0 0 3px rgba(112, 189, 136, 0.15);
+  }
+
+  .eyebrow,
+  .section-label {
+    color: #9ab49f;
+  }
+
+  h1 span {
+    color: #9db9a3;
+  }
+
+  .generator-card {
+    border-color: rgba(188, 220, 194, 0.1);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24), 0 2px 7px rgba(0, 0, 0, 0.14);
+  }
+
+  .result-hint {
+    color: #a2afa5;
+  }
+
+  .word-count-chip {
+    border-color: #3c4d41;
+    background: #202b24;
+    color: #c1d4c4;
+  }
+
+  .result-box {
+    border-color: #39483d;
+    background: #162119;
+  }
+
+  .passphrase {
+    color: #d7e9da;
+  }
+
+  .copy-button {
+    border-color: #435448;
+    background: #26332a;
+    color: #d0dbd1;
+  }
+
+  .copy-button:hover:not(:disabled) {
+    border-color: #617b68;
+    background: #2b3a30;
+  }
+
+  .view-tab {
+    color: #abb8ad;
+  }
+
+  .view-tab span {
+    color: #93a197;
+  }
+
+  .view-tab.is-active {
+    background: #304a37;
+    color: #d8ebdc;
+  }
+
+  .view-tab.is-active span {
+    color: #a9cdb0;
+  }
+
+  .rules-link {
+    color: #a4b2a8;
+  }
+
+  .controls {
+    border-color: #34443a;
+  }
+
+  .control-label {
+    color: #c2cec4;
+  }
+
+  input[type="range"] {
+    background: #405344;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    border-color: #1c2820;
+    background: #79bb8c;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    border-color: #1c2820;
+    background: #79bb8c;
+  }
+
+  .range-line output {
+    color: #d5e7d7;
+  }
+
+  .control-note {
+    color: #9aa89e;
+  }
+
+  .select-control select {
+    border-color: #415347;
+    outline-color: #79bb8c;
+    background: #1c2820;
+    color: #dbe6dc;
+  }
+
+  .generate-button {
+    background: #39734d;
+    color: #f5fff7;
+  }
+
+  .generate-button:hover:not(:disabled) {
+    background: #46865b;
+  }
+
+  .status-message {
+    color: #a9cfb3;
+  }
+
+  .status-message.is-error {
+    color: #ffaaa3;
+  }
+
+  .page-footer {
+    color: #99a69d;
+  }
+
+  :focus-visible {
+    outline-color: rgba(135, 205, 151, 0.55);
+  }
+}
