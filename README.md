@@ -6,6 +6,8 @@ with `crypto.getRandomValues`; no generated text is sent to a server.
 Choose a fixed separator or open Advanced options to pick randomly from an
 editable character list. Advanced options also provide capitalization styles and
 a configurable 1–12 digit random number.
+Generator preferences are saved in browser storage and restored on the next visit;
+generated passphrases themselves are not saved.
 
 The Romanized view uses the BGN/PCGN letter mappings, including `х → h`,
 `ъ → a`, `ь → y`, and `щ → sht`.

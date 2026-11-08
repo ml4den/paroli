@@ -27,12 +27,15 @@
   const themeModeLabel = document.querySelector("#theme-mode-label");
   const themeColor = document.querySelector("#theme-color");
   const tabs = [...document.querySelectorAll(".view-tab")];
+  const preferencesKey = "bulgarian-passphrase-settings-v1";
+  const storageWarning = "Browser storage is unavailable; settings cannot be saved on this device.";
 
   let words = [];
   let chosenWords = [];
   let generatedNumber = "";
   let generatedSeparators = [];
   let activeView = "cyrillic";
+  let preferenceStorageUnavailable = false;
   const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
   const themeModes = ["system", "light", "dark"];
   let themeMode = themeModes.includes(document.documentElement.dataset.themeMode)
@@ -176,6 +179,83 @@
       : "Choose 1–12 digits";
   }
 
+  function restorePreferences() {
+    let serialized;
+    try {
+      serialized = localStorage.getItem(preferencesKey);
+    } catch {
+      preferenceStorageUnavailable = true;
+      return;
+    }
+    if (!serialized) return;
+
+    try {
+      const saved = JSON.parse(serialized);
+      if (!saved || typeof saved !== "object") return;
+
+      const wordCount = Number(saved.wordCount);
+      if (Number.isInteger(wordCount) && wordCount >= 2 && wordCount <= 8) {
+        wordCountInput.value = String(wordCount);
+        wordCountValue.value = String(wordCount);
+        wordCountChip.textContent = `${wordCount} ${wordCount === 1 ? "word" : "words"}`;
+      }
+      if (["-", " ", ".", "_", "!"].includes(saved.separator)) {
+        separatorInput.value = saved.separator;
+      }
+      if (typeof saved.includeNumber === "boolean") {
+        includeNumberInput.checked = saved.includeNumber;
+      }
+      const numberLength = Number(saved.numberLength);
+      if (Number.isInteger(numberLength) && numberLength >= 1 && numberLength <= 12) {
+        numberLengthInput.value = String(numberLength);
+      }
+      if (
+        typeof saved.separatorCharacters === "string" &&
+        Array.from(saved.separatorCharacters).length <= 256
+      ) {
+        separatorCharactersInput.value = saved.separatorCharacters;
+      }
+      if (["title", "lower", "first", "upper"].includes(saved.capitalization)) {
+        capitalizationInput.value = saved.capitalization;
+      }
+      if (typeof saved.advancedOpen === "boolean") {
+        advancedOptions.open = saved.advancedOpen;
+      }
+      if (saved.view === "cyrillic" || saved.view === "romanized") {
+        activeView = saved.view;
+      }
+      syncViewTabs();
+      updateNumberNote();
+    } catch {
+      // Ignore malformed or outdated preferences and use the app defaults.
+    }
+  }
+
+  function savePreferences() {
+    const settings = {
+      wordCount: Number(wordCountInput.value),
+      separator: separatorInput.value,
+      includeNumber: includeNumberInput.checked,
+      numberLength: numberLengthInput.value,
+      separatorCharacters: separatorCharactersInput.value,
+      capitalization: capitalizationInput.value,
+      advancedOpen: advancedOptions.open,
+      view: activeView,
+    };
+    try {
+      localStorage.setItem(preferencesKey, JSON.stringify(settings));
+      preferenceStorageUnavailable = false;
+      if (statusMessage.textContent === storageWarning) {
+        statusMessage.textContent = "";
+        statusMessage.classList.remove("is-error");
+      }
+    } catch {
+      preferenceStorageUnavailable = true;
+      statusMessage.textContent = storageWarning;
+      statusMessage.classList.add("is-error");
+    }
+  }
+
   function generate() {
     if (words.length === 0) return;
     try {
@@ -233,6 +313,10 @@
       if (words.length < 100) throw new Error("The dictionary file appears to be incomplete.");
       generateButton.disabled = false;
       generate();
+      if (preferenceStorageUnavailable) {
+        statusMessage.textContent = storageWarning;
+        statusMessage.classList.add("is-error");
+      }
     } catch (error) {
       passphrase.textContent = "Dictionary unavailable";
       statusMessage.textContent = `${error.message} Please reload the page to try again.`;
@@ -255,15 +339,20 @@
 
   function selectView(tab, focus = false) {
     activeView = tab.dataset.view;
+    syncViewTabs();
+    if (focus) tab.focus();
+    renderPassphrase();
+    savePreferences();
+  }
+
+  function syncViewTabs() {
     rulesLink.hidden = activeView !== "romanized";
     tabs.forEach((item) => {
-      const selected = item === tab;
+      const selected = item.dataset.view === activeView;
       item.classList.toggle("is-active", selected);
       item.setAttribute("aria-selected", String(selected));
       item.tabIndex = selected ? 0 : -1;
     });
-    if (focus) tab.focus();
-    renderPassphrase();
   }
 
   tabs.forEach((tab) => {
@@ -283,7 +372,10 @@
   });
   tabs.forEach((tab, index) => { tab.tabIndex = index === 0 ? 0 : -1; });
 
-  wordCountInput.addEventListener("input", generate);
+  wordCountInput.addEventListener("input", () => {
+    generate();
+    savePreferences();
+  });
   separatorInput.addEventListener("change", () => {
     try {
       refreshGeneratedSeparators();
@@ -294,25 +386,35 @@
       statusMessage.textContent = error.message;
       statusMessage.classList.add("is-error");
     }
+    savePreferences();
   });
-  includeNumberInput.addEventListener("change", updateRandomNumber);
+  includeNumberInput.addEventListener("change", () => {
+    updateRandomNumber();
+    savePreferences();
+  });
   numberLengthInput.addEventListener("input", () => {
     updateNumberNote();
     if (includeNumberInput.checked && advancedOptions.open) updateRandomNumber();
+    savePreferences();
   });
   separatorCharactersInput.addEventListener("input", () => {
-    if (!advancedOptions.open) return;
-    try {
-      refreshGeneratedSeparators();
-      renderPassphrase();
-      statusMessage.textContent = "";
-      statusMessage.classList.remove("is-error");
-    } catch (error) {
-      statusMessage.textContent = error.message;
-      statusMessage.classList.add("is-error");
+    if (advancedOptions.open) {
+      try {
+        refreshGeneratedSeparators();
+        renderPassphrase();
+        statusMessage.textContent = "";
+        statusMessage.classList.remove("is-error");
+      } catch (error) {
+        statusMessage.textContent = error.message;
+        statusMessage.classList.add("is-error");
+      }
     }
+    savePreferences();
   });
-  capitalizationInput.addEventListener("change", renderPassphrase);
+  capitalizationInput.addEventListener("change", () => {
+    renderPassphrase();
+    savePreferences();
+  });
   advancedOptions.addEventListener("toggle", () => {
     updateNumberNote();
     if (includeNumberInput.checked) updateRandomNumber();
@@ -325,9 +427,11 @@
         statusMessage.classList.add("is-error");
       }
     }
+    savePreferences();
   });
   generateButton.addEventListener("click", generate);
   copyButton.addEventListener("click", copyCurrentPhrase);
 
+  restorePreferences();
   loadDictionary();
 })();
