@@ -1,0 +1,1 @@
+- [Static preview caching](static-preview-caching.md) — a preview capture can retain the old page after static files change; distinguish stale rendering from server failures.
