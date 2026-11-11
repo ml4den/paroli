@@ -12,7 +12,6 @@
   const wordCountValue = document.querySelector("#word-count-value");
   const wordCountChip = document.querySelector("#word-count-chip");
   const separatorInput = document.querySelector("#separator");
-  const separatorModeNote = document.querySelector("#separator-mode-note");
   const includeNumberInput = document.querySelector("#include-number");
   const numberLengthInput = document.querySelector("#number-length");
   const numberOptionNote = document.querySelector("#number-option-note");
@@ -20,7 +19,6 @@
   const capitalizationInput = document.querySelector("#capitalization");
   const advancedOptions = document.querySelector(".advanced-options");
   const passphrase = document.querySelector("#passphrase");
-  const passphrasePanel = document.querySelector("#passphrase-panel");
   const generateButton = document.querySelector("#generate-button");
   const copyButton = document.querySelector("#copy-button");
   const statusMessage = document.querySelector("#status-message");
@@ -38,7 +36,6 @@
   let generatedSeparators = [];
   let activeView = "cyrillic";
   let preferenceStorageUnavailable = false;
-  let switchTimer;
   const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
   const themeModes = ["system", "light", "dark"];
   let themeMode = themeModes.includes(document.documentElement.dataset.themeMode)
@@ -56,7 +53,7 @@
       "aria-label",
       `Appearance setting: ${themeMode}. Activate to switch to another mode.`
     );
-    themeColor.content = theme === "dark" ? "#211927" : "#e9f2ec";
+    themeColor.content = theme === "dark" ? "#111813" : "#f5f3ed";
   }
 
   themeToggle.addEventListener("click", () => {
@@ -137,7 +134,6 @@
       return `${phrase}${generatedSeparators[index - 1] ?? separatorInput.value}${part}`;
     }, "");
     passphrase.lang = activeView === "romanized" ? "en-Latn" : "bg";
-    passphrase.classList.remove("is-loading");
     copyButton.disabled = chosenWords.length === 0;
     copyButton.querySelector("span").textContent = "Copy";
   }
@@ -278,7 +274,6 @@
       chosenWords = [];
       generatedNumber = "";
       generatedSeparators = [];
-      passphrase.classList.remove("is-loading");
       passphrase.textContent = "Unable to generate";
       copyButton.disabled = true;
       statusMessage.textContent = error.message;
@@ -299,7 +294,6 @@
     } catch (error) {
       generatedNumber = "";
       generatedSeparators = [];
-      passphrase.classList.remove("is-loading");
       passphrase.textContent = "Unable to generate";
       statusMessage.textContent = error.message;
       statusMessage.classList.add("is-error");
@@ -324,7 +318,6 @@
         statusMessage.classList.add("is-error");
       }
     } catch (error) {
-      passphrase.classList.remove("is-loading");
       passphrase.textContent = "Dictionary unavailable";
       statusMessage.textContent = `${error.message} Please reload the page to try again.`;
       statusMessage.classList.add("is-error");
@@ -349,10 +342,6 @@
     syncViewTabs();
     if (focus) tab.focus();
     renderPassphrase();
-    passphrase.classList.remove("is-switching");
-    window.clearTimeout(switchTimer);
-    requestAnimationFrame(() => passphrase.classList.add("is-switching"));
-    switchTimer = window.setTimeout(() => passphrase.classList.remove("is-switching"), 180);
     savePreferences();
   }
 
@@ -364,16 +353,6 @@
       item.setAttribute("aria-selected", String(selected));
       item.tabIndex = selected ? 0 : -1;
     });
-    passphrasePanel.setAttribute("aria-labelledby", activeView === "romanized" ? "romanized-tab" : "cyrillic-tab");
-  }
-
-  function syncSeparatorMode() {
-    const randomMode = advancedOptions.open;
-    separatorInput.disabled = randomMode;
-    separatorInput.setAttribute("aria-disabled", String(randomMode));
-    separatorModeNote.textContent = randomMode
-      ? "Random characters in Advanced options are active."
-      : "Fixed between each word.";
   }
 
   tabs.forEach((tab) => {
@@ -437,7 +416,6 @@
     savePreferences();
   });
   advancedOptions.addEventListener("toggle", () => {
-    syncSeparatorMode();
     updateNumberNote();
     if (includeNumberInput.checked) updateRandomNumber();
     else {
@@ -455,6 +433,5 @@
   copyButton.addEventListener("click", copyCurrentPhrase);
 
   restorePreferences();
-  syncSeparatorMode();
   loadDictionary();
 })();

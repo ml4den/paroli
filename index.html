@@ -7,7 +7,7 @@
       name="description"
       content="Generate memorable Bulgarian passphrases locally, with an optional BGN/PCGN romanized view."
     />
-    <meta name="theme-color" id="theme-color" content="#e9f2ec" />
+    <meta name="theme-color" id="theme-color" content="#f5f3ed" />
     <script>
       (() => {
         const themeKey = "bulgarian-passphrase-theme";
@@ -22,12 +22,12 @@
         const theme = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
         document.documentElement.dataset.themeMode = mode;
         document.documentElement.dataset.theme = theme;
-        document.getElementById("theme-color").content = theme === "dark" ? "#211927" : "#e9f2ec";
+        document.getElementById("theme-color").content = theme === "dark" ? "#111813" : "#f5f3ed";
       })();
     </script>
     <link rel="icon" href="./public/favicon.png" />
-    <title>Word by Word — Bulgarian passphrases</title>
-    <link rel="stylesheet" href="./styles.css?v=reading-room" />
+    <title>Bulgarian Passphrase Generator</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="page-shell">
@@ -58,146 +58,132 @@
         </div>
       </header>
 
-      <section class="workspace" aria-labelledby="page-title">
-        <header class="workspace-heading">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">A little Bulgarian, a lot more memorable</p>
+        <h1 id="page-title">A passphrase<br /><span>worth remembering.</span></h1>
+        <p class="intro">
+          Build a phrase from Bulgarian dictionary words. Switch between the
+          original Cyrillic and a BGN/PCGN romanized view.
+        </p>
+      </section>
+
+      <section class="generator-card" aria-label="Passphrase generator">
+        <div class="result-heading">
           <div>
-            <h1 id="page-title">Bulgarian, <span>word by word.</span></h1>
-            <p class="intro">A passphrase from Bulgarian words, in Cyrillic or BGN/PCGN Romanized.</p>
+            <p class="section-label">YOUR PASSPHRASE</p>
+            <p class="result-hint">Made locally. Nothing is sent anywhere.</p>
           </div>
-          <p class="local-note"><span class="privacy-dot" aria-hidden="true"></span> Generated on this device</p>
-        </header>
+          <span class="word-count-chip" id="word-count-chip">4 words</span>
+        </div>
 
-        <section class="generator-card" aria-label="Passphrase generator">
-          <div class="result-heading">
-            <div>
-              <p class="section-label">PASSPHRASE</p>
-              <p class="result-hint">Your words, ready to use.</p>
-            </div>
-            <span class="word-count-chip" id="word-count-chip">4 words</span>
-          </div>
-
-          <div class="result-box" id="passphrase-panel" role="tabpanel" aria-labelledby="cyrillic-tab" aria-live="polite" aria-atomic="true">
-            <p class="passphrase is-loading" id="passphrase" lang="bg">Loading dictionary…</p>
-            <button class="copy-button" id="copy-button" type="button" aria-label="Copy passphrase">
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                <rect x="8" y="8" width="12" height="12" rx="2"></rect>
-                <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
-              </svg>
-              <span>Copy</span>
-            </button>
-          </div>
-
-          <div class="result-actions">
-            <div class="view-switch" role="tablist" aria-label="Passphrase writing system">
-              <button class="view-tab is-active" id="cyrillic-tab" type="button" role="tab" aria-selected="true" aria-controls="passphrase-panel" data-view="cyrillic">
-                <span aria-hidden="true">БГ</span> Cyrillic
-              </button>
-              <button class="view-tab" id="romanized-tab" type="button" role="tab" aria-selected="false" aria-controls="passphrase-panel" data-view="romanized">
-                <span aria-hidden="true">Aa</span> Romanized
-              </button>
-            </div>
-            <a class="rules-link" id="rules-link" href="https://en.wikipedia.org/wiki/Romanization_of_Bulgarian#BGN/PCGN" target="_blank" rel="noreferrer" hidden>
-              BGN/PCGN rules <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-
-          <button class="generate-button" id="generate-button" type="button" disabled>
+        <div class="result-box" aria-live="polite" aria-atomic="true">
+          <p class="passphrase" id="passphrase" lang="bg">Loading dictionary…</p>
+          <button class="copy-button" id="copy-button" type="button" aria-label="Copy passphrase">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="M20 7v5h-5M4 17v-5h5"></path>
-              <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path>
+              <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+              <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
             </svg>
-            Generate another
+            <span>Copy</span>
           </button>
-          <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
-        </section>
+        </div>
 
-        <section class="settings-panel" aria-labelledby="settings-title">
-          <div class="settings-heading">
-            <div>
-              <h2 id="settings-title">Make it yours</h2>
-              <p>Choose the shape of your phrase.</p>
+        <div class="view-switch" role="tablist" aria-label="Passphrase writing system">
+          <button class="view-tab is-active" id="cyrillic-tab" type="button" role="tab" aria-selected="true" aria-controls="passphrase" data-view="cyrillic">
+            <span aria-hidden="true">БГ</span> Cyrillic
+          </button>
+          <button class="view-tab" id="romanized-tab" type="button" role="tab" aria-selected="false" aria-controls="passphrase" data-view="romanized">
+            <span aria-hidden="true">Aa</span> Romanized
+          </button>
+          <a class="rules-link" id="rules-link" href="https://en.wikipedia.org/wiki/Romanization_of_Bulgarian#BGN/PCGN" target="_blank" rel="noreferrer" hidden>
+            BGN/PCGN rules <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="controls">
+          <label class="range-control" for="word-count">
+            <span class="control-label">Number of words</span>
+            <span class="range-line">
+              <input id="word-count" type="range" min="2" max="8" value="4" />
+              <output id="word-count-value" for="word-count">4</output>
+            </span>
+            <span class="control-note">More words make a longer, stronger phrase.</span>
+          </label>
+
+          <label class="select-control" for="separator">
+            <span class="control-label">Word separator</span>
+            <select id="separator">
+              <option value="-">Hyphen —</option>
+              <option value=" ">Space</option>
+              <option value=".">Period .</option>
+              <option value="_">Underscore _</option>
+              <option value="!">Exclamation mark !</option>
+            </select>
+          </label>
+
+          <label class="number-option" for="include-number">
+            <input id="include-number" type="checkbox" />
+            <span class="number-option-copy">
+              <strong>Append a random number</strong>
+              <span id="number-option-note">Two digits, from 10 to 99</span>
+            </span>
+          </label>
+
+          <details class="advanced-options">
+            <summary>Advanced options</summary>
+            <div class="advanced-grid">
+              <label class="advanced-control" for="separator-characters">
+                <span class="control-label">Random separator characters</span>
+                <input
+                  id="separator-characters"
+                  type="text"
+                  value="~!@#$%^&amp;*()_-+={}[]|:;&quot;'&lt;,&gt;.?/"
+                  maxlength="256"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                />
+                <span class="control-note">One character is chosen randomly between each word.</span>
+              </label>
+
+              <label class="advanced-control" for="number-length">
+                <span class="control-label">Random number length</span>
+                <span class="number-length-line">
+                  <input id="number-length" type="number" min="1" max="12" value="2" inputmode="numeric" />
+                  <span>digits</span>
+                </span>
+                <span class="control-note">The number is added after the final word.</span>
+              </label>
+
+              <label class="advanced-control" for="capitalization">
+                <span class="control-label">Capitalization</span>
+                <select id="capitalization">
+                  <option value="title">Capitalize each word</option>
+                  <option value="lower">all lowercase</option>
+                  <option value="first">First letter of phrase</option>
+                  <option value="upper">ALL CAPS</option>
+                </select>
+              </label>
             </div>
-          </div>
-          <div class="controls">
-            <label class="range-control" for="word-count">
-              <span class="control-label">Number of words</span>
-              <span class="range-line">
-                <input id="word-count" type="range" min="2" max="8" value="4" />
-                <output id="word-count-value" for="word-count">4</output>
-              </span>
-              <span class="control-note">More words make a longer phrase.</span>
-            </label>
+          </details>
+        </div>
 
-            <label class="select-control" for="separator">
-              <span class="control-label">Word separator</span>
-              <select id="separator" aria-describedby="separator-mode-note">
-                <option value="-">Hyphen —</option>
-                <option value=" ">Space</option>
-                <option value=".">Period .</option>
-                <option value="_">Underscore _</option>
-                <option value="!">Exclamation mark !</option>
-              </select>
-              <span class="control-note" id="separator-mode-note">Fixed between each word.</span>
-            </label>
-
-            <label class="number-option" for="include-number">
-              <input id="include-number" type="checkbox" />
-              <span class="number-option-copy">
-                <strong>Append a random number</strong>
-                <span id="number-option-note">Two digits, from 10 to 99</span>
-              </span>
-            </label>
-
-            <details class="advanced-options">
-              <summary>
-                <span>Advanced options</span>
-                <span class="advanced-summary-note">Random separators, digit length &amp; capitalization</span>
-              </summary>
-              <div class="advanced-grid">
-                <label class="advanced-control" for="separator-characters">
-                  <span class="control-label">Random separator characters</span>
-                  <input
-                    id="separator-characters"
-                    type="text"
-                    value="~!@#$%^&amp;*()_-+={}[]|:;&quot;'&lt;,&gt;.?/"
-                    maxlength="256"
-                    autocomplete="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                  />
-                  <span class="control-note">One character is selected between each part.</span>
-                </label>
-
-                <label class="advanced-control" for="number-length">
-                  <span class="control-label">Random number length</span>
-                  <span class="number-length-line">
-                    <input id="number-length" type="number" min="1" max="12" value="2" inputmode="numeric" />
-                    <span>digits</span>
-                  </span>
-                  <span class="control-note">Added after the final word.</span>
-                </label>
-
-                <label class="advanced-control" for="capitalization">
-                  <span class="control-label">Capitalization</span>
-                  <select id="capitalization">
-                    <option value="title">Capitalize each word</option>
-                    <option value="lower">all lowercase</option>
-                    <option value="first">First letter of phrase</option>
-                    <option value="upper">ALL CAPS</option>
-                  </select>
-                </label>
-              </div>
-            </details>
-          </div>
-        </section>
+        <button class="generate-button" id="generate-button" type="button" disabled>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <path d="M20 7v5h-5M4 17v-5h5"></path>
+            <path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path>
+          </svg>
+          Generate another
+        </button>
+        <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
       </section>
 
       <footer class="page-footer">
         <p>
-          The word list loads as a static file. Phrase generation and saved preferences stay in your browser.
+          The dictionary is loaded as a static file. Random words come from
+          your browser’s cryptographic random generator.
         </p>
       </footer>
     </main>
-    <script src="./app.js?v=reading-room" defer></script>
+    <script src="./app.js" defer></script>
   </body>
 </html>
