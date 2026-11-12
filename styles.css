@@ -534,6 +534,7 @@ input[type="range"]::-moz-range-thumb {
 
 .page-footer p {
   margin: 5px 0;
+  text-wrap: balance;
 }
 
 :focus-visible {

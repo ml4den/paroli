@@ -1,5 +1,8 @@
 # Bulgarian Passphrase Generator
 
+The interface is in Bulgarian, since the generated phrases are built from
+Bulgarian words. UI labels below are given in English for reference.
+
 A dependency-free, single-page passphrase generator using the existing Bulgarian
 dictionary in `public/wordlist.txt`. Passphrases are generated in the browser
 with `crypto.getRandomValues`; no generated text is sent to a server.

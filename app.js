@@ -30,7 +30,9 @@
   const themeColor = document.querySelector("#theme-color");
   const tabs = [...document.querySelectorAll(".view-tab")];
   const preferencesKey = "bulgarian-passphrase-settings-v1";
-  const storageWarning = "Browser storage is unavailable; settings cannot be saved on this device.";
+  const storageWarning = "Браузърът не позволява запазване на данни, затова настройките няма да се запомнят.";
+  const themeLabels = { system: "Системна", light: "Светла", dark: "Тъмна" };
+  const plural = (count, one, many) => `${count} ${count === 1 ? one : many}`;
 
   let words = [];
   let chosenWords = [];
@@ -52,10 +54,10 @@
       : themeMode;
     document.documentElement.dataset.themeMode = themeMode;
     document.documentElement.dataset.theme = theme;
-    themeModeLabel.textContent = themeMode.charAt(0).toUpperCase() + themeMode.slice(1);
+    themeModeLabel.textContent = themeLabels[themeMode];
     themeToggle.setAttribute(
       "aria-label",
-      `Appearance setting: ${themeMode}. Activate to switch to another mode.`
+      `Тема: ${themeLabels[themeMode].toLocaleLowerCase("bg-BG")}. Натиснете, за да я смените.`
     );
     themeColor.content = theme === "dark" ? "#111813" : "#f5f3ed";
   }
@@ -88,10 +90,10 @@
 
   function secureIndex(max) {
     if (!Number.isSafeInteger(max) || max < 1) {
-      throw new Error("The dictionary did not contain enough usable words.");
+      throw new Error("Речникът не съдържа достатъчно подходящи думи.");
     }
     if (!window.crypto || typeof window.crypto.getRandomValues !== "function") {
-      throw new Error("This browser does not provide secure random numbers.");
+      throw new Error("Този браузър не поддържа сигурно генериране на случайни числа.");
     }
 
     const range = 0x100000000;
@@ -127,8 +129,8 @@
 
   function renderPassphrase() {
     if (generationError || chosenWords.length === 0) {
-      if (generationError) passphrase.textContent = "Unable to generate";
-      charCountChip.textContent = "0 characters";
+      if (generationError) passphrase.textContent = "Неуспешно генериране";
+      charCountChip.textContent = plural(0, "знак", "знака");
       copyButton.disabled = true;
       return;
     }
@@ -146,11 +148,11 @@
       if (index === 0) return part;
       return `${phrase}${generatedSeparators[index - 1] ?? separatorInput.value}${part}`;
     }, "");
-    passphrase.lang = activeView === "romanized" ? "en-Latn" : "bg";
+    passphrase.lang = activeView === "romanized" ? "bg-Latn" : "bg";
     const characterCount = Array.from(passphrase.textContent).length;
-    charCountChip.textContent = `${characterCount} ${characterCount === 1 ? "character" : "characters"}`;
+    charCountChip.textContent = plural(characterCount, "знак", "знака");
     copyButton.disabled = chosenWords.length === 0;
-    copyButton.querySelector("span").textContent = "Copy";
+    copyButton.querySelector("span").textContent = "Копирай";
   }
 
   function validNumberLength(value) {
@@ -163,7 +165,7 @@
     const emptyPool = separatorMode === "random" && Array.from(separatorCharactersInput.value).length === 0;
     separatorCharactersInput.setAttribute("aria-invalid", String(emptyPool));
     if (emptyPool) {
-      throw new Error("Add at least one character to the random separator list.");
+      throw new Error("Добавете поне един знак в списъка.");
     }
   }
 
@@ -238,7 +240,7 @@
       if (Number.isInteger(wordCount) && wordCount >= 2 && wordCount <= 8) {
         wordCountInput.value = String(wordCount);
         wordCountValue.value = String(wordCount);
-        wordCountChip.textContent = `${wordCount} ${wordCount === 1 ? "word" : "words"}`;
+        wordCountChip.textContent = plural(wordCount, "дума", "думи");
       }
       if (["-", " ", ".", "_", "!"].includes(saved.separator)) {
         separatorInput.value = saved.separator;
@@ -296,7 +298,7 @@
       refreshGeneratedSeparators();
       generationError = "";
       wordCountValue.value = String(count);
-      wordCountChip.textContent = `${count} ${count === 1 ? "word" : "words"}`;
+      wordCountChip.textContent = plural(count, "дума", "думи");
       renderPassphrase();
       showStatus();
     } catch (error) {
@@ -324,19 +326,19 @@
   async function loadDictionary() {
     try {
       const response = await fetch("./public/wordlist.txt");
-      if (!response.ok) throw new Error(`Dictionary could not be loaded (${response.status}).`);
+      if (!response.ok) throw new Error(`Речникът не можа да се зареди (${response.status}).`);
       const text = (await response.text()).replace(/^\uFEFF/, "");
       words = [...new Set(
         text.split(",")
           .map((word) => word.trim().normalize("NFC"))
           .filter((word) => alphabet.test(word))
       )];
-      if (words.length < 100) throw new Error("The dictionary file appears to be incomplete.");
+      if (words.length < 100) throw new Error("Файлът с речника изглежда непълен.");
       generateButton.disabled = false;
       generate();
     } catch (error) {
-      passphrase.textContent = "Dictionary unavailable";
-      statusMessage.textContent = `${error.message} Please reload the page to try again.`;
+      passphrase.textContent = "Речникът не е достъпен";
+      statusMessage.textContent = `${error.message} Презаредете страницата, за да опитате отново.`;
       statusMessage.classList.add("is-error");
     }
   }
@@ -345,10 +347,10 @@
     if (!chosenWords.length || generationError) return;
     try {
       await navigator.clipboard.writeText(passphrase.textContent);
-      copyButton.querySelector("span").textContent = "Copied";
-      showStatus("Passphrase copied to clipboard.");
+      copyButton.querySelector("span").textContent = "Копирано";
+      showStatus("Паролата е копирана.");
     } catch {
-      showStatus("Clipboard access is unavailable in this browser.", true);
+      showStatus("Копирането не успя. Маркирайте паролата и я копирайте ръчно.", true);
     }
   }
 

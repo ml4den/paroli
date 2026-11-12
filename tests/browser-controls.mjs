@@ -147,14 +147,14 @@ try {
   assert.equal(await evaluate("window.copiedText"), cyrillic);
   await input("#capitalization", "upper", "change");
   s = await state();
-  assert.equal(s.cap, "ALL CAPS");
+  assert.equal(s.cap, "САМО ГЛАВНИ");
   assert.equal(s.phrase, s.phrase.toLocaleUpperCase("bg-BG"));
   await load();
   s = await state();
   assert.equal(s.digits, "12");
   assert.equal(s.pool, "@");
   assert.equal(s.fixed, "_");
-  assert.equal(s.cap, "ALL CAPS");
+  assert.equal(s.cap, "САМО ГЛАВНИ");
   assert.deepEqual(Object.keys(s.saved).sort(), [
     "wordCount", "separator", "numberLength", "separatorCharacters",
     "capitalization", "separatorMode", "view",
@@ -173,7 +173,7 @@ try {
     assert.equal(s.pool, "★");
     assert.equal(s.view, "romanized");
     assert.equal(s.wordCount, "3");
-    assert.equal(s.cap, "all lowercase");
+    assert.equal(s.cap, "само малки букви");
     assert.match(s.phrase, new RegExp(`${advancedOpen ? "★" : "!"}[1-9][0-9]{8}$`, "u"));
     assert.equal(s.saved.separatorMode, s.mode);
   }
@@ -195,9 +195,9 @@ try {
   await click('[name="separator-mode"][value="random"]');
   await input("#separator-characters", "");
   assert.ok((await state()).copyDisabled);
-  assert.match((await state()).status, /at least one character/u);
+  assert.match((await state()).status, /поне един знак/u);
   await click("#romanized-tab");
-  assert.equal((await state()).phrase, "Unable to generate");
+  assert.equal((await state()).phrase, "Неуспешно генериране");
   await input("#number-length", "4");
   await input("#separator-characters", "😀");
   s = await state();
@@ -235,11 +235,11 @@ try {
     source: `Object.defineProperty(window, 'localStorage', { get() { throw new Error('Storage blocked'); } });`,
   });
   await load();
-  assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /storage is unavailable/u);
+  assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /не позволява запазване/u);
   await click("#generate-button");
   await input("#number-length", "2");
   assert.match(await evaluate(`document.querySelector('#passphrase').textContent`), /-[1-9][0-9]$/u);
-  assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /storage is unavailable/u);
+  assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /не позволява запазване/u);
   console.log("PASS blocked browser storage still allows local generation");
 } finally {
   socket?.close();
