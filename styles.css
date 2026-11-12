@@ -204,6 +204,13 @@ h1 span {
   font-size: 12px;
 }
 
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
 .word-count-chip {
   padding: 7px 10px;
   border: 1px solid #e7ece6;

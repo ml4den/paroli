@@ -11,6 +11,7 @@
   const wordCountInput = document.querySelector("#word-count");
   const wordCountValue = document.querySelector("#word-count-value");
   const wordCountChip = document.querySelector("#word-count-chip");
+  const charCountChip = document.querySelector("#char-count-chip");
   const separatorInput = document.querySelector("#separator");
   const separatorModes = [...document.querySelectorAll('[name="separator-mode"]')];
   const fixedSeparatorControl = document.querySelector("#fixed-separator-control");
@@ -127,6 +128,7 @@
   function renderPassphrase() {
     if (generationError || chosenWords.length === 0) {
       if (generationError) passphrase.textContent = "Unable to generate";
+      charCountChip.textContent = "0 characters";
       copyButton.disabled = true;
       return;
     }
@@ -145,6 +147,8 @@
       return `${phrase}${generatedSeparators[index - 1] ?? separatorInput.value}${part}`;
     }, "");
     passphrase.lang = activeView === "romanized" ? "en-Latn" : "bg";
+    const characterCount = Array.from(passphrase.textContent).length;
+    charCountChip.textContent = `${characterCount} ${characterCount === 1 ? "character" : "characters"}`;
     copyButton.disabled = chosenWords.length === 0;
     copyButton.querySelector("span").textContent = "Copy";
   }
