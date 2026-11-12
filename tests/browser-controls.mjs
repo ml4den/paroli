@@ -83,13 +83,10 @@ try {
       randomHidden: $('#random-separator-control').hidden,
       fixedDisabled: $('#separator').disabled,
       randomDisabled: $('#separator-characters').disabled,
-      numberHidden: $('#number-length-control').hidden,
-      numberDisabled: $('#number-length').disabled,
       digits: $('#number-length').value,
       fixed: $('#separator').value,
       pool: $('#separator-characters').value,
-      summary: $('#capitalization-summary').textContent,
-      open: $('.advanced-options').open,
+      cap: $('#capitalization').selectedOptions[0].textContent,
       view: $('[aria-selected="true"]').dataset.view,
       wordCount: $('#word-count').value,
       theme: document.documentElement.dataset.theme,
@@ -112,23 +109,17 @@ try {
   await load();
   let s = await state();
   assert.equal(s.mode, "fixed");
-  assert.ok(s.randomHidden && s.randomDisabled && s.numberHidden && s.numberDisabled);
-  assert.equal(s.wordCount, "4");
+  assert.ok(s.randomHidden && s.randomDisabled);
+  assert.equal(s.digits, "0", "Random number defaults to off");
+  assert.doesNotMatch(s.phrase, /[0-9]/u);
+  assert.equal(s.wordCount, "2");
   assert.equal(await evaluate(`document.querySelector('#word-count').min`), "2");
   const original = s.phrase;
-  await click(".advanced-options summary");
-  await delay(50);
-  assert.equal((await state()).phrase, original);
-  await click(".advanced-options summary");
-  await delay(50);
-  assert.equal((await state()).phrase, original);
   await input("#separator-characters", "@");
   assert.equal((await state()).phrase, original, "Inactive pool must not affect output");
-  await click("#include-number");
   await input("#number-length", "7");
   s = await state();
   assert.match(s.phrase, /-[1-9][0-9]{6}$/u);
-  assert.ok(!s.numberHidden && !s.numberDisabled);
   const withNumber = fixedParts(s.phrase);
   await click('[name="separator-mode"][value="random"]');
   s = await state();
@@ -138,13 +129,11 @@ try {
   assert.equal((await state()).phrase, s.phrase, "Inactive fixed separator must not affect output");
   await click('[name="separator-mode"][value="fixed"]');
   assert.deepEqual((await state()).phrase.split("_"), withNumber);
-  await click("#include-number");
+  await input("#number-length", "0");
   s = await state();
-  assert.ok(s.numberHidden && s.numberDisabled);
-  assert.equal(s.digits, "7");
+  assert.doesNotMatch(s.phrase, /[0-9]/u, "Zero removes the number");
+  assert.deepEqual(s.phrase.split("_").length, withNumber.length - 1);
   await input("#number-length", "12");
-  assert.equal((await state()).phrase, s.phrase, "Inactive digit count must not affect output");
-  await click("#include-number");
   assert.match((await state()).phrase, /_[1-9][0-9]{11}$/u);
   const cyrillic = (await state()).phrase;
   await click("#romanized-tab");
@@ -156,30 +145,25 @@ try {
   })`);
   await click("#copy-button");
   assert.equal(await evaluate("window.copiedText"), cyrillic);
-  await click(".advanced-options summary");
   await input("#capitalization", "upper", "change");
   s = await state();
-  assert.equal(s.summary, "ALL CAPS");
+  assert.equal(s.cap, "ALL CAPS");
   assert.equal(s.phrase, s.phrase.toLocaleUpperCase("bg-BG"));
-  await click(".advanced-options summary");
-  await delay(50);
-  assert.equal((await state()).phrase, s.phrase);
   await load();
   s = await state();
   assert.equal(s.digits, "12");
   assert.equal(s.pool, "@");
   assert.equal(s.fixed, "_");
-  assert.equal(s.summary, "ALL CAPS");
-  assert.equal(s.open, false);
+  assert.equal(s.cap, "ALL CAPS");
   assert.deepEqual(Object.keys(s.saved).sort(), [
-    "wordCount", "separator", "includeNumber", "numberLength", "separatorCharacters",
-    "capitalization", "separatorMode", "moreOptionsOpen", "view",
+    "wordCount", "separator", "numberLength", "separatorCharacters",
+    "capitalization", "separatorMode", "view",
   ].sort(), "Persist settings only, never generated text");
   console.log("PASS independent controls, writing systems, disclosure, and refresh");
 
   for (const advancedOpen of [false, true]) {
     await setSaved({
-      advancedOpen, wordCount: 2, separator: "!", separatorCharacters: "★",
+      advancedOpen, wordCount: 3, separator: "!", separatorCharacters: "★",
       numberLength: "9", includeNumber: true, capitalization: "lower", view: "romanized",
     });
     s = await state();
@@ -188,19 +172,23 @@ try {
     assert.equal(s.fixed, "!");
     assert.equal(s.pool, "★");
     assert.equal(s.view, "romanized");
-    assert.equal(s.wordCount, "2");
-    assert.equal(s.summary, "all lowercase");
+    assert.equal(s.wordCount, "3");
+    assert.equal(s.cap, "all lowercase");
     assert.match(s.phrase, new RegExp(`${advancedOpen ? "★" : "!"}[1-9][0-9]{8}$`, "u"));
     assert.equal(s.saved.separatorMode, s.mode);
   }
-  for (const numberLength of [undefined, null, false, {}, "", 0, -1, 13, 1.5, "bad"]) {
+  for (const numberLength of [undefined, null, false, {}, "", -1, 13, 1.5, "bad"]) {
     await setSaved({ numberLength, includeNumber: true });
-    assert.equal((await state()).digits, "2");
+    assert.equal((await state()).digits, "0");
   }
+  await setSaved({ numberLength: "9", includeNumber: false });
+  assert.equal((await state()).digits, "0", "Legacy disabled number migrates to 0");
+  await setSaved({ numberLength: "5" });
+  assert.equal((await state()).digits, "5");
   for (const malformed of ["{", "null", "[]", "42"]) {
     await setSaved(malformed);
     assert.equal((await state()).mode, "fixed");
-    assert.equal((await state()).digits, "2");
+    assert.equal((await state()).digits, "0");
   }
   console.log("PASS legacy migration and malformed preferences");
 
@@ -210,23 +198,15 @@ try {
   assert.match((await state()).status, /at least one character/u);
   await click("#romanized-tab");
   assert.equal((await state()).phrase, "Unable to generate");
-  await click("#include-number"); // Enabling while the pool is invalid must recover later.
   await input("#number-length", "4");
   await input("#separator-characters", "😀");
   s = await state();
   assert.ok(!s.copyDisabled);
   assert.match(s.phrase, /😀[1-9][0-9]{3}$/u);
-  for (const invalid of ["", "0", "13", "1.5"]) {
-    await input("#number-length", invalid);
-    s = await state();
-    assert.ok(s.copyDisabled);
-    assert.match(s.status, /1 to 12/u);
-  }
-  await click("#include-number");
-  assert.ok(!(await state()).copyDisabled, "Disabling invalid number must recover");
   await input("#number-length", "1");
-  await click("#include-number");
   assert.match((await state()).phrase, /😀[1-9]$/u);
+  await input("#number-length", "0");
+  assert.doesNotMatch((await state()).phrase, /[0-9]/u);
   console.log("PASS invalid active settings and recovery without stale copying");
 
   for (const width of [320, 390, 1280]) {
@@ -257,7 +237,7 @@ try {
   await load();
   assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /storage is unavailable/u);
   await click("#generate-button");
-  await click("#include-number");
+  await input("#number-length", "2");
   assert.match(await evaluate(`document.querySelector('#passphrase').textContent`), /-[1-9][0-9]$/u);
   assert.match(await evaluate(`document.querySelector('#status-message').textContent`), /storage is unavailable/u);
   console.log("PASS blocked browser storage still allows local generation");

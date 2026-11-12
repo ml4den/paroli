@@ -73,7 +73,7 @@
             <p class="section-label">YOUR PASSPHRASE</p>
             <p class="result-hint">Made locally. Nothing is sent anywhere.</p>
           </div>
-          <span class="word-count-chip" id="word-count-chip">4 words</span>
+          <span class="word-count-chip" id="word-count-chip">2 words</span>
         </div>
 
         <div class="result-box" aria-live="polite" aria-atomic="true">
@@ -103,8 +103,8 @@
           <label class="range-control" for="word-count">
             <span class="control-label">Number of words</span>
             <span class="range-line">
-              <input id="word-count" type="range" min="2" max="8" value="4" />
-              <output id="word-count-value" for="word-count">4</output>
+              <input id="word-count" type="range" min="2" max="8" value="2" />
+              <output id="word-count-value" for="word-count">2</output>
             </span>
             <span class="control-note">More words make a longer, stronger phrase.</span>
           </label>
@@ -142,38 +142,24 @@
             </label>
           </fieldset>
 
-          <div class="number-settings">
-          <label class="number-option" for="include-number">
-            <input id="include-number" type="checkbox" />
-            <span class="number-option-copy">
-              <strong>Add a number</strong>
-              <span id="number-option-note">Two digits, from 10 to 99</span>
+          <label class="range-control" for="number-length">
+            <span class="control-label">Random number length</span>
+            <span class="range-line">
+              <input id="number-length" type="range" min="0" max="12" step="1" value="0" aria-describedby="number-length-note" />
+              <output id="number-length-value" for="number-length">0</output>
             </span>
+            <span class="control-note" id="number-length-note">Digits added after the final word. Set to 0 for no number.</span>
           </label>
-              <label class="advanced-control" id="number-length-control" for="number-length" hidden>
-                <span class="control-label">Random number length</span>
-                <span class="number-length-line">
-                  <input id="number-length" type="number" min="1" max="12" step="1" value="2" inputmode="numeric" aria-describedby="number-length-note" disabled />
-                  <span>digits</span>
-                </span>
-                <span class="control-note" id="number-length-note">Choose 1–12 digits. The number is added after the final word, without a leading zero.</span>
-              </label>
-          </div>
 
-          <details class="advanced-options">
-            <summary>More options <span class="capitalization-summary" id="capitalization-summary">Capitalize each word</span></summary>
-            <div class="advanced-grid">
-              <label class="advanced-control" for="capitalization">
-                <span class="control-label">Capitalization</span>
-                <select id="capitalization">
-                  <option value="title">Capitalize each word</option>
-                  <option value="lower">all lowercase</option>
-                  <option value="first">First letter of phrase</option>
-                  <option value="upper">ALL CAPS</option>
-                </select>
-              </label>
-            </div>
-          </details>
+          <label class="select-control" for="capitalization">
+            <span class="control-label">Capitalization</span>
+            <select id="capitalization">
+              <option value="title">Capitalize each word</option>
+              <option value="lower">all lowercase</option>
+              <option value="first">First letter of phrase</option>
+              <option value="upper">ALL CAPS</option>
+            </select>
+          </label>
         </div>
 
         <button class="generate-button" id="generate-button" type="button" disabled>

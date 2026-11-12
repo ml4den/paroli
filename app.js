@@ -15,14 +15,10 @@
   const separatorModes = [...document.querySelectorAll('[name="separator-mode"]')];
   const fixedSeparatorControl = document.querySelector("#fixed-separator-control");
   const randomSeparatorControl = document.querySelector("#random-separator-control");
-  const numberLengthControl = document.querySelector("#number-length-control");
-  const capitalizationSummary = document.querySelector("#capitalization-summary");
-  const includeNumberInput = document.querySelector("#include-number");
   const numberLengthInput = document.querySelector("#number-length");
-  const numberOptionNote = document.querySelector("#number-option-note");
+  const numberLengthValue = document.querySelector("#number-length-value");
   const separatorCharactersInput = document.querySelector("#separator-characters");
   const capitalizationInput = document.querySelector("#capitalization");
-  const advancedOptions = document.querySelector(".advanced-options");
   const passphrase = document.querySelector("#passphrase");
   const generateButton = document.querySelector("#generate-button");
   const copyButton = document.querySelector("#copy-button");
@@ -156,17 +152,12 @@
   function validNumberLength(value) {
     return (typeof value === "number" || typeof value === "string") &&
       String(value).trim() !== "" &&
-      Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 12;
+      Number.isInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 12;
   }
 
   function validateSettings() {
-    const invalidLength = includeNumberInput.checked && !validNumberLength(numberLengthInput.value);
     const emptyPool = separatorMode === "random" && Array.from(separatorCharactersInput.value).length === 0;
-    numberLengthInput.setAttribute("aria-invalid", String(invalidLength));
     separatorCharactersInput.setAttribute("aria-invalid", String(emptyPool));
-    if (invalidLength) {
-      throw new Error("Choose a random number length from 1 to 12 digits.");
-    }
     if (emptyPool) {
       throw new Error("Add at least one character to the random separator list.");
     }
@@ -174,6 +165,7 @@
 
   function randomNumber() {
     const requestedLength = Number(numberLengthInput.value);
+    if (requestedLength === 0) return "";
     const firstDigit = String(1 + secureIndex(9));
     const remainingDigits = Array.from(
       { length: requestedLength - 1 },
@@ -185,8 +177,7 @@
   function refreshGeneratedSeparators() {
     validateSettings();
     // Recover coherently if another active setting was corrected after an error.
-    if (!includeNumberInput.checked) generatedNumber = "";
-    else if (generatedNumber.length !== Number(numberLengthInput.value)) generatedNumber = randomNumber();
+    if (generatedNumber.length !== Number(numberLengthInput.value)) generatedNumber = randomNumber();
     const partCount = chosenWords.length + (generatedNumber ? 1 : 0);
     const separatorCount = Math.max(0, partCount - 1);
     if (separatorMode === "random") {
@@ -201,10 +192,7 @@
   }
 
   function updateNumberNote() {
-    const digits = Number(numberLengthInput.value);
-    numberOptionNote.textContent = Number.isInteger(digits) && digits >= 1 && digits <= 12
-      ? `${digits} ${digits === 1 ? "digit" : "digits"}`
-      : "Choose 1–12 digits";
+    numberLengthValue.value = numberLengthInput.value;
   }
 
   function syncSettingsControls() {
@@ -213,9 +201,6 @@
     randomSeparatorControl.hidden = separatorMode !== "random";
     separatorCharactersInput.disabled = separatorMode !== "random";
     separatorModes.forEach((input) => { input.checked = input.value === separatorMode; });
-    numberLengthControl.hidden = !includeNumberInput.checked;
-    numberLengthInput.disabled = !includeNumberInput.checked;
-    capitalizationSummary.textContent = capitalizationInput.selectedOptions[0].textContent;
     updateNumberNote();
   }
 
@@ -254,11 +239,8 @@
       if (["-", " ", ".", "_", "!"].includes(saved.separator)) {
         separatorInput.value = saved.separator;
       }
-      if (typeof saved.includeNumber === "boolean") {
-        includeNumberInput.checked = saved.includeNumber;
-      }
-      numberLengthInput.value = validNumberLength(saved.numberLength)
-        ? String(Number(saved.numberLength)) : "2";
+      numberLengthInput.value = saved.includeNumber !== false && validNumberLength(saved.numberLength)
+        ? String(Number(saved.numberLength)) : "0";
       if (
         typeof saved.separatorCharacters === "string" &&
         Array.from(saved.separatorCharacters).length <= 256
@@ -270,7 +252,6 @@
       }
       separatorMode = ["fixed", "random"].includes(saved.separatorMode)
         ? saved.separatorMode : (saved.advancedOpen === true ? "random" : "fixed");
-      advancedOptions.open = saved.moreOptionsOpen === true;
       if (saved.view === "cyrillic" || saved.view === "romanized") {
         activeView = saved.view;
       }
@@ -285,12 +266,10 @@
     const settings = {
       wordCount: Number(wordCountInput.value),
       separator: separatorInput.value,
-      includeNumber: includeNumberInput.checked,
       numberLength: numberLengthInput.value,
       separatorCharacters: separatorCharactersInput.value,
       capitalization: capitalizationInput.value,
       separatorMode,
-      moreOptionsOpen: advancedOptions.open,
       view: activeView,
     };
     try {
@@ -309,9 +288,7 @@
       const count = Number(wordCountInput.value);
       validateSettings();
       chosenWords = Array.from({ length: count }, () => words[secureIndex(words.length)]);
-      generatedNumber = includeNumberInput.checked
-        ? randomNumber()
-        : "";
+      generatedNumber = randomNumber();
       refreshGeneratedSeparators();
       generationError = "";
       wordCountValue.value = String(count);
@@ -330,9 +307,7 @@
     }
     try {
       validateSettings();
-      generatedNumber = includeNumberInput.checked
-        ? randomNumber()
-        : "";
+      generatedNumber = randomNumber();
       refreshGeneratedSeparators();
       generationError = "";
       renderPassphrase();
@@ -436,14 +411,9 @@
     if (separatorMode === "fixed") updateSeparators();
     savePreferences();
   });
-  includeNumberInput.addEventListener("change", () => {
-    syncSettingsControls();
-    updateRandomNumber();
-    savePreferences();
-  });
   numberLengthInput.addEventListener("input", () => {
     updateNumberNote();
-    if (includeNumberInput.checked) updateRandomNumber();
+    updateRandomNumber();
     savePreferences();
   });
   separatorCharactersInput.addEventListener("input", () => {
@@ -453,9 +423,6 @@
   capitalizationInput.addEventListener("change", () => {
     syncSettingsControls();
     renderPassphrase();
-    savePreferences();
-  });
-  advancedOptions.addEventListener("toggle", () => {
     savePreferences();
   });
   generateButton.addEventListener("click", generate);
