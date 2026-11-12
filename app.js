@@ -240,7 +240,7 @@
         separatorInput.value = saved.separator;
       }
       numberLengthInput.value = saved.includeNumber !== false && validNumberLength(saved.numberLength)
-        ? String(Number(saved.numberLength)) : "0";
+        ? String(Number(saved.numberLength)) : "2";
       if (
         typeof saved.separatorCharacters === "string" &&
         Array.from(saved.separatorCharacters).length <= 256

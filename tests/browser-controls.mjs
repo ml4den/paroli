@@ -110,8 +110,8 @@ try {
   let s = await state();
   assert.equal(s.mode, "fixed");
   assert.ok(s.randomHidden && s.randomDisabled);
-  assert.equal(s.digits, "0", "Random number defaults to off");
-  assert.doesNotMatch(s.phrase, /[0-9]/u);
+  assert.equal(s.digits, "2", "Random number defaults to 2 digits");
+  assert.match(s.phrase, /-[1-9][0-9]$/u);
   assert.equal(s.wordCount, "2");
   assert.equal(await evaluate(`document.querySelector('#word-count').min`), "2");
   const original = s.phrase;
@@ -179,7 +179,7 @@ try {
   }
   for (const numberLength of [undefined, null, false, {}, "", -1, 13, 1.5, "bad"]) {
     await setSaved({ numberLength, includeNumber: true });
-    assert.equal((await state()).digits, "0");
+    assert.equal((await state()).digits, "2");
   }
   await setSaved({ numberLength: "9", includeNumber: false });
   assert.equal((await state()).digits, "0", "Legacy disabled number migrates to 0");
@@ -188,7 +188,7 @@ try {
   for (const malformed of ["{", "null", "[]", "42"]) {
     await setSaved(malformed);
     assert.equal((await state()).mode, "fixed");
-    assert.equal((await state()).digits, "0");
+    assert.equal((await state()).digits, "2");
   }
   console.log("PASS legacy migration and malformed preferences");
 
