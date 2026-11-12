@@ -25,7 +25,8 @@
         document.getElementById("theme-color").content = theme === "dark" ? "#111813" : "#f5f3ed";
       })();
     </script>
-    <link rel="icon" href="./public/favicon.png" />
+    <link rel="icon" href="./public/favicon.png" type="image/png" sizes="512x512" />
+    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
     <title>Генератор на пароли от български думи</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -33,7 +34,9 @@
     <main class="page-shell">
       <header class="topbar">
         <a class="brand" href="./" aria-label="Дума по дума – начало">
-          <span class="brand-mark" aria-hidden="true">П</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 34 34"><path d="M10.5 24V10h13v14h-3V13h-7v11z"></path></svg>
+          </span>
           <span>ДУМА ПО ДУМА</span>
         </a>
         <div class="topbar-actions">
