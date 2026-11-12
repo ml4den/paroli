@@ -20,6 +20,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
@@ -326,11 +330,56 @@ h1 span {
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 180px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
   margin-top: 28px;
   padding-top: 24px;
   border-top: 1px solid #eef0eb;
+}
+
+.separator-settings {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.separator-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: inherit;
+  font-size: 12px;
+}
+
+.separator-modes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.separator-modes input {
+  margin: 0;
+  accent-color: var(--green);
+}
+
+.number-settings {
+  grid-column: 1 / -1;
+}
+
+.number-settings > .advanced-control {
+  margin-top: 16px;
+}
+
+.capitalization-summary {
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+.control-note {
+  line-height: 1.5;
 }
 
 .control-label {

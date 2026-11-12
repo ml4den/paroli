@@ -109,8 +109,14 @@
             <span class="control-note">More words make a longer, stronger phrase.</span>
           </label>
 
-          <label class="select-control" for="separator">
-            <span class="control-label">Word separator</span>
+          <fieldset class="separator-settings">
+            <legend class="control-label">Word separator</legend>
+            <div class="separator-modes">
+              <label><input type="radio" name="separator-mode" value="fixed" checked /> Fixed separator</label>
+              <label><input type="radio" name="separator-mode" value="random" /> Random characters</label>
+            </div>
+            <label class="select-control" id="fixed-separator-control" for="separator">
+              <span class="control-label">Fixed separator</span>
             <select id="separator">
               <option value="-">Hyphen —</option>
               <option value=" ">Space</option>
@@ -118,42 +124,45 @@
               <option value="_">Underscore _</option>
               <option value="!">Exclamation mark !</option>
             </select>
-          </label>
+            </label>
+            <label class="advanced-control" id="random-separator-control" for="separator-characters" hidden>
+              <span class="control-label">Random separator characters</span>
+              <input
+                id="separator-characters"
+                type="text"
+                value="~!@#$%^&amp;*()_-+={}[]|:;&quot;'&lt;,&gt;.?/"
+                maxlength="256"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                aria-describedby="separator-characters-note"
+                disabled
+              />
+              <span class="control-note" id="separator-characters-note">A character is independently chosen at each gap, including before an appended number.</span>
+            </label>
+          </fieldset>
 
+          <div class="number-settings">
           <label class="number-option" for="include-number">
             <input id="include-number" type="checkbox" />
             <span class="number-option-copy">
-              <strong>Append a random number</strong>
+              <strong>Add a number</strong>
               <span id="number-option-note">Two digits, from 10 to 99</span>
             </span>
           </label>
-
-          <details class="advanced-options">
-            <summary>Advanced options</summary>
-            <div class="advanced-grid">
-              <label class="advanced-control" for="separator-characters">
-                <span class="control-label">Random separator characters</span>
-                <input
-                  id="separator-characters"
-                  type="text"
-                  value="~!@#$%^&amp;*()_-+={}[]|:;&quot;'&lt;,&gt;.?/"
-                  maxlength="256"
-                  autocomplete="off"
-                  autocapitalize="off"
-                  spellcheck="false"
-                />
-                <span class="control-note">One character is chosen randomly between each word.</span>
-              </label>
-
-              <label class="advanced-control" for="number-length">
+              <label class="advanced-control" id="number-length-control" for="number-length" hidden>
                 <span class="control-label">Random number length</span>
                 <span class="number-length-line">
-                  <input id="number-length" type="number" min="1" max="12" value="2" inputmode="numeric" />
+                  <input id="number-length" type="number" min="1" max="12" step="1" value="2" inputmode="numeric" aria-describedby="number-length-note" disabled />
                   <span>digits</span>
                 </span>
-                <span class="control-note">The number is added after the final word.</span>
+                <span class="control-note" id="number-length-note">Choose 1–12 digits. The number is added after the final word, without a leading zero.</span>
               </label>
+          </div>
 
+          <details class="advanced-options">
+            <summary>More options <span class="capitalization-summary" id="capitalization-summary">Capitalize each word</span></summary>
+            <div class="advanced-grid">
               <label class="advanced-control" for="capitalization">
                 <span class="control-label">Capitalization</span>
                 <select id="capitalization">

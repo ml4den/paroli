@@ -12,6 +12,11 @@
   const wordCountValue = document.querySelector("#word-count-value");
   const wordCountChip = document.querySelector("#word-count-chip");
   const separatorInput = document.querySelector("#separator");
+  const separatorModes = [...document.querySelectorAll('[name="separator-mode"]')];
+  const fixedSeparatorControl = document.querySelector("#fixed-separator-control");
+  const randomSeparatorControl = document.querySelector("#random-separator-control");
+  const numberLengthControl = document.querySelector("#number-length-control");
+  const capitalizationSummary = document.querySelector("#capitalization-summary");
   const includeNumberInput = document.querySelector("#include-number");
   const numberLengthInput = document.querySelector("#number-length");
   const numberOptionNote = document.querySelector("#number-option-note");
@@ -35,6 +40,8 @@
   let generatedNumber = "";
   let generatedSeparators = [];
   let activeView = "cyrillic";
+  let separatorMode = "fixed";
+  let generationError = "";
   let preferenceStorageUnavailable = false;
   const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
   const themeModes = ["system", "light", "dark"];
@@ -64,7 +71,10 @@
     }
     try {
       localStorage.setItem("bulgarian-passphrase-theme", themeMode);
-    } catch {}
+    } catch {
+      preferenceStorageUnavailable = true;
+      showStatus();
+    }
     applyThemeMode();
   });
 
@@ -119,6 +129,11 @@
   }
 
   function renderPassphrase() {
+    if (generationError || chosenWords.length === 0) {
+      if (generationError) passphrase.textContent = "Unable to generate";
+      copyButton.disabled = true;
+      return;
+    }
     const mode = capitalizationInput.value;
     const lowerWords = chosenWords.map((word) => word.toLocaleLowerCase("bg-BG"));
     const uncapitalizedWords = activeView === "romanized"
@@ -138,11 +153,27 @@
     copyButton.querySelector("span").textContent = "Copy";
   }
 
-  function randomNumber() {
-    const requestedLength = advancedOptions.open ? Number(numberLengthInput.value) : 2;
-    if (!Number.isInteger(requestedLength) || requestedLength < 1 || requestedLength > 12) {
+  function validNumberLength(value) {
+    return (typeof value === "number" || typeof value === "string") &&
+      String(value).trim() !== "" &&
+      Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 12;
+  }
+
+  function validateSettings() {
+    const invalidLength = includeNumberInput.checked && !validNumberLength(numberLengthInput.value);
+    const emptyPool = separatorMode === "random" && Array.from(separatorCharactersInput.value).length === 0;
+    numberLengthInput.setAttribute("aria-invalid", String(invalidLength));
+    separatorCharactersInput.setAttribute("aria-invalid", String(emptyPool));
+    if (invalidLength) {
       throw new Error("Choose a random number length from 1 to 12 digits.");
     }
+    if (emptyPool) {
+      throw new Error("Add at least one character to the random separator list.");
+    }
+  }
+
+  function randomNumber() {
+    const requestedLength = Number(numberLengthInput.value);
     const firstDigit = String(1 + secureIndex(9));
     const remainingDigits = Array.from(
       { length: requestedLength - 1 },
@@ -152,13 +183,14 @@
   }
 
   function refreshGeneratedSeparators() {
+    validateSettings();
+    // Recover coherently if another active setting was corrected after an error.
+    if (!includeNumberInput.checked) generatedNumber = "";
+    else if (generatedNumber.length !== Number(numberLengthInput.value)) generatedNumber = randomNumber();
     const partCount = chosenWords.length + (generatedNumber ? 1 : 0);
     const separatorCount = Math.max(0, partCount - 1);
-    if (advancedOptions.open) {
+    if (separatorMode === "random") {
       const characters = Array.from(separatorCharactersInput.value);
-      if (characters.length === 0 && separatorCount > 0) {
-        throw new Error("Add at least one character to the random separator list.");
-      }
       generatedSeparators = Array.from(
         { length: separatorCount },
         () => characters[secureIndex(characters.length)]
@@ -169,14 +201,34 @@
   }
 
   function updateNumberNote() {
-    if (!advancedOptions.open) {
-      numberOptionNote.textContent = "Two digits, from 10 to 99";
-      return;
-    }
     const digits = Number(numberLengthInput.value);
     numberOptionNote.textContent = Number.isInteger(digits) && digits >= 1 && digits <= 12
       ? `${digits} ${digits === 1 ? "digit" : "digits"}`
       : "Choose 1–12 digits";
+  }
+
+  function syncSettingsControls() {
+    fixedSeparatorControl.hidden = separatorMode !== "fixed";
+    separatorInput.disabled = separatorMode !== "fixed";
+    randomSeparatorControl.hidden = separatorMode !== "random";
+    separatorCharactersInput.disabled = separatorMode !== "random";
+    separatorModes.forEach((input) => { input.checked = input.value === separatorMode; });
+    numberLengthControl.hidden = !includeNumberInput.checked;
+    numberLengthInput.disabled = !includeNumberInput.checked;
+    capitalizationSummary.textContent = capitalizationInput.selectedOptions[0].textContent;
+    updateNumberNote();
+  }
+
+  function showStatus(message = "", isError = false) {
+    statusMessage.textContent = message + (preferenceStorageUnavailable
+      ? `${message ? " " : ""}${storageWarning}` : "");
+    statusMessage.classList.toggle("is-error", isError || preferenceStorageUnavailable);
+  }
+
+  function showGenerationError(error) {
+    generationError = error.message;
+    renderPassphrase();
+    showStatus(generationError, true);
   }
 
   function restorePreferences() {
@@ -191,7 +243,7 @@
 
     try {
       const saved = JSON.parse(serialized);
-      if (!saved || typeof saved !== "object") return;
+      if (!saved || typeof saved !== "object" || Array.isArray(saved)) return;
 
       const wordCount = Number(saved.wordCount);
       if (Number.isInteger(wordCount) && wordCount >= 2 && wordCount <= 8) {
@@ -205,10 +257,8 @@
       if (typeof saved.includeNumber === "boolean") {
         includeNumberInput.checked = saved.includeNumber;
       }
-      const numberLength = Number(saved.numberLength);
-      if (Number.isInteger(numberLength) && numberLength >= 1 && numberLength <= 12) {
-        numberLengthInput.value = String(numberLength);
-      }
+      numberLengthInput.value = validNumberLength(saved.numberLength)
+        ? String(Number(saved.numberLength)) : "2";
       if (
         typeof saved.separatorCharacters === "string" &&
         Array.from(saved.separatorCharacters).length <= 256
@@ -218,9 +268,9 @@
       if (["title", "lower", "first", "upper"].includes(saved.capitalization)) {
         capitalizationInput.value = saved.capitalization;
       }
-      if (typeof saved.advancedOpen === "boolean") {
-        advancedOptions.open = saved.advancedOpen;
-      }
+      separatorMode = ["fixed", "random"].includes(saved.separatorMode)
+        ? saved.separatorMode : (saved.advancedOpen === true ? "random" : "fixed");
+      advancedOptions.open = saved.moreOptionsOpen === true;
       if (saved.view === "cyrillic" || saved.view === "romanized") {
         activeView = saved.view;
       }
@@ -239,20 +289,17 @@
       numberLength: numberLengthInput.value,
       separatorCharacters: separatorCharactersInput.value,
       capitalization: capitalizationInput.value,
-      advancedOpen: advancedOptions.open,
+      separatorMode,
+      moreOptionsOpen: advancedOptions.open,
       view: activeView,
     };
     try {
       localStorage.setItem(preferencesKey, JSON.stringify(settings));
       preferenceStorageUnavailable = false;
-      if (statusMessage.textContent === storageWarning) {
-        statusMessage.textContent = "";
-        statusMessage.classList.remove("is-error");
-      }
+      showStatus(generationError, Boolean(generationError));
     } catch {
       preferenceStorageUnavailable = true;
-      statusMessage.textContent = storageWarning;
-      statusMessage.classList.add("is-error");
+      showStatus(generationError, Boolean(generationError));
     }
   }
 
@@ -260,43 +307,38 @@
     if (words.length === 0) return;
     try {
       const count = Number(wordCountInput.value);
+      validateSettings();
       chosenWords = Array.from({ length: count }, () => words[secureIndex(words.length)]);
       generatedNumber = includeNumberInput.checked
         ? randomNumber()
         : "";
       refreshGeneratedSeparators();
+      generationError = "";
       wordCountValue.value = String(count);
       wordCountChip.textContent = `${count} ${count === 1 ? "word" : "words"}`;
       renderPassphrase();
-      statusMessage.textContent = "";
-      statusMessage.classList.remove("is-error");
+      showStatus();
     } catch (error) {
-      chosenWords = [];
-      generatedNumber = "";
-      generatedSeparators = [];
-      passphrase.textContent = "Unable to generate";
-      copyButton.disabled = true;
-      statusMessage.textContent = error.message;
-      statusMessage.classList.add("is-error");
+      showGenerationError(error);
     }
   }
 
   function updateRandomNumber() {
-    if (chosenWords.length === 0) return;
+    if (chosenWords.length !== Number(wordCountInput.value)) {
+      generate();
+      return;
+    }
     try {
+      validateSettings();
       generatedNumber = includeNumberInput.checked
         ? randomNumber()
         : "";
       refreshGeneratedSeparators();
+      generationError = "";
       renderPassphrase();
-      statusMessage.textContent = "";
-      statusMessage.classList.remove("is-error");
+      showStatus();
     } catch (error) {
-      generatedNumber = "";
-      generatedSeparators = [];
-      passphrase.textContent = "Unable to generate";
-      statusMessage.textContent = error.message;
-      statusMessage.classList.add("is-error");
+      showGenerationError(error);
     }
   }
 
@@ -313,10 +355,6 @@
       if (words.length < 100) throw new Error("The dictionary file appears to be incomplete.");
       generateButton.disabled = false;
       generate();
-      if (preferenceStorageUnavailable) {
-        statusMessage.textContent = storageWarning;
-        statusMessage.classList.add("is-error");
-      }
     } catch (error) {
       passphrase.textContent = "Dictionary unavailable";
       statusMessage.textContent = `${error.message} Please reload the page to try again.`;
@@ -325,15 +363,13 @@
   }
 
   async function copyCurrentPhrase() {
-    if (!chosenWords.length) return;
+    if (!chosenWords.length || generationError) return;
     try {
       await navigator.clipboard.writeText(passphrase.textContent);
       copyButton.querySelector("span").textContent = "Copied";
-      statusMessage.textContent = "Passphrase copied to clipboard.";
-      statusMessage.classList.remove("is-error");
+      showStatus("Passphrase copied to clipboard.");
     } catch {
-      statusMessage.textContent = "Clipboard access is unavailable in this browser.";
-      statusMessage.classList.add("is-error");
+      showStatus("Clipboard access is unavailable in this browser.", true);
     }
   }
 
@@ -376,62 +412,58 @@
     generate();
     savePreferences();
   });
-  separatorInput.addEventListener("change", () => {
+  function updateSeparators() {
+    if (chosenWords.length !== Number(wordCountInput.value)) {
+      generate();
+      return;
+    }
     try {
       refreshGeneratedSeparators();
+      generationError = "";
       renderPassphrase();
-      statusMessage.textContent = "";
-      statusMessage.classList.remove("is-error");
+      showStatus();
     } catch (error) {
-      statusMessage.textContent = error.message;
-      statusMessage.classList.add("is-error");
+      showGenerationError(error);
     }
+  }
+  separatorModes.forEach((input) => input.addEventListener("change", () => {
+    separatorMode = input.value;
+    syncSettingsControls();
+    updateSeparators();
+    savePreferences();
+  }));
+  separatorInput.addEventListener("change", () => {
+    if (separatorMode === "fixed") updateSeparators();
     savePreferences();
   });
   includeNumberInput.addEventListener("change", () => {
+    syncSettingsControls();
     updateRandomNumber();
     savePreferences();
   });
   numberLengthInput.addEventListener("input", () => {
     updateNumberNote();
-    if (includeNumberInput.checked && advancedOptions.open) updateRandomNumber();
+    if (includeNumberInput.checked) updateRandomNumber();
     savePreferences();
   });
   separatorCharactersInput.addEventListener("input", () => {
-    if (advancedOptions.open) {
-      try {
-        refreshGeneratedSeparators();
-        renderPassphrase();
-        statusMessage.textContent = "";
-        statusMessage.classList.remove("is-error");
-      } catch (error) {
-        statusMessage.textContent = error.message;
-        statusMessage.classList.add("is-error");
-      }
-    }
+    if (separatorMode === "random") updateSeparators();
     savePreferences();
   });
   capitalizationInput.addEventListener("change", () => {
+    syncSettingsControls();
     renderPassphrase();
     savePreferences();
   });
   advancedOptions.addEventListener("toggle", () => {
-    updateNumberNote();
-    if (includeNumberInput.checked) updateRandomNumber();
-    else {
-      try {
-        refreshGeneratedSeparators();
-        renderPassphrase();
-      } catch (error) {
-        statusMessage.textContent = error.message;
-        statusMessage.classList.add("is-error");
-      }
-    }
     savePreferences();
   });
   generateButton.addEventListener("click", generate);
   copyButton.addEventListener("click", copyCurrentPhrase);
 
   restorePreferences();
+  syncSettingsControls();
+  // Persist the migrated explicit mode so the legacy disclosure no longer controls it.
+  savePreferences();
   loadDictionary();
 })();
