@@ -1,1 +1,0 @@
-- [Settings interaction design](settings-interaction-design.md) — use explicit independent choices; revealing controls must not activate generation modes.
